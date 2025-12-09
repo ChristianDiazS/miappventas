@@ -26,16 +26,10 @@ jobs:
       - name: 📝 Install root dependencies
         run: npm ci --legacy-peer-deps --no-audit --no-fund
       
-      - name: 📝 Install backend dependencies
-        run: npm ci --legacy-peer-deps --no-audit --no-fund --prefix backend
-      
-      - name: 📝 Install frontend dependencies
-        run: npm ci --legacy-peer-deps --no-audit --no-fund --prefix frontend
-      
       - name: 🧪 Run backend tests
-        run: npm test --prefix backend -- --passWithNoTests 2>/dev/null || true
+        run: cd backend && npm test -- --passWithNoTests 2>/dev/null || true
         continue-on-error: true
       
       - name: 🧪 Run frontend tests
-        run: npm test --prefix frontend -- --passWithNoTests 2>/dev/null || true
+        run: cd frontend && npm test -- --passWithNoTests 2>/dev/null || true
         continue-on-error: true
