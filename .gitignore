@@ -2,8 +2,8 @@
 node_modules/
 npm-debug.log
 yarn-error.log
-package-lock.json
-yarn.lock
+# package-lock.json and yarn.lock are REQUIRED for GitHub Actions
+# Do NOT ignore these files
 
 # Environment variables
 .env
