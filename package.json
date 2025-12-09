@@ -1,0 +1,24 @@
+{
+  "name": "miappventas",
+  "version": "1.0.0",
+  "description": "E-commerce platform - MiAppVentas",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "test": "npm test -w backend && npm test -w frontend",
+    "start:backend": "npm start -w backend",
+    "start:frontend": "npm run dev -w frontend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": "18.x || 20.x",
+    "npm": ">=10.0.0"
+  }
+}
