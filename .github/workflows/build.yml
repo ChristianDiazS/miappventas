@@ -81,73 +81,81 @@ jobs:
           echo "✅ Frontend and Backend builds completed successfully!"
           echo "📦 Artifacts ready for deployment"
         
-      - name: Send Slack Success Notification
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "✅ MiAppVentas Build Successful",
-              "attachments": [
-                {
-                  "color": "good",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "value": "✅ All builds completed",
-                      "short": true
-                    },
-                    {
-                      "title": "Environment",
-                      "value": "Production Ready",
-                      "short": true
-                    },
-                    {
-                      "title": "Frontend",
-                      "value": "✅ Built successfully",
-                      "short": true
-                    },
-                    {
-                      "title": "Backend",
-                      "value": "✅ Validated successfully",
-                      "short": true
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        continue-on-error: true
+      # Slack notification disabled - add SLACK_WEBHOOK_URL secret to enable
+      # - name: Send Slack Success Notification
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "✅ MiAppVentas Build Successful",
+      #         "attachments": [
+      #           {
+      #             "color": "good",
+      #             "fields": [
+      #               {
+      #                 "title": "Status",
+      #                 "value": "✅ All builds completed",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Environment",
+      #                 "value": "Production Ready",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Frontend",
+      #                 "value": "✅ Built successfully",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Backend",
+      #                 "value": "✅ Validated successfully",
+      #                 "short": true
+      #               }
+      #             ]
+      #           }
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   continue-on-error: true
+
+      - name: ✅ Build notification
+        run: echo "Build completed successfully"
 
   notify-failure:
     runs-on: ubuntu-latest
     if: failure()
     
     steps:
-      - name: Notify Build Failure
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "❌ MiAppVentas Build Failed",
-              "attachments": [
-                {
-                  "color": "danger",
-                  "fields": [
-                    {
-                      "title": "Status",
-                      "value": "❌ Build failed - check logs",
-                      "short": true
-                    },
-                    {
-                      "title": "Branch",
-                      "value": "${{ github.ref_name }}",
-                      "short": true
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        continue-on-error: true
+      # Slack notification disabled - add SLACK_WEBHOOK_URL secret to enable
+      # - name: Notify Build Failure
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "❌ MiAppVentas Build Failed",
+      #         "attachments": [
+      #           {
+      #             "color": "danger",
+      #             "fields": [
+      #               {
+      #                 "title": "Status",
+      #                 "value": "❌ Build failed - check logs",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Branch",
+      #                 "value": "${{ github.ref_name }}",
+      #                 "short": true
+      #               }
+      #             ]
+      #           }
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   continue-on-error: true
+
+      - name: ❌ Log build failure
+        run: echo "Build failed - check logs for details"

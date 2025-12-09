@@ -132,35 +132,40 @@ jobs:
             echo "color=warning" >> $GITHUB_OUTPUT
           fi
       
-      - name: Send Slack Notification
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "${{ steps.status.outputs.status }}",
-              "attachments": [
-                {
-                  "color": "${{ steps.status.outputs.color }}",
-                  "fields": [
-                    {
-                      "title": "Repository",
-                      "value": "${{ github.repository }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Branch",
-                      "value": "${{ github.ref_name }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Commit",
-                      "value": "${{ github.sha }}",
-                      "short": false
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        continue-on-error: true
+      # Slack notification disabled - add SLACK_WEBHOOK_URL secret to enable
+      # - name: Send Slack Notification
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "${{ steps.status.outputs.status }}",
+      #         "attachments": [
+      #           {
+      #             "color": "${{ steps.status.outputs.color }}",
+      #             "fields": [
+      #               {
+      #                 "title": "Repository",
+      #                 "value": "${{ github.repository }}",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Branch",
+      #                 "value": "${{ github.ref_name }}",
+      #                 "short": true
+      #               },
+      #               {
+      #                 "title": "Commit",
+      #                 "value": "${{ github.sha }}",
+      #                 "short": false
+      #               }
+      #             ]
+      #           }
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   continue-on-error: true
+
+      - name: ✅ CI/CD Pipeline notification
+        run: |
+          echo "Pipeline execution completed successfully"
