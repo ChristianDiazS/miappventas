@@ -12,19 +12,19 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18, 20]
     
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
-      - name: 📦 Install Node.js ${{ matrix.node-version }}
-        run: |
-          curl -fsSL https://deb.nodesource.com/setup_$(echo "${{ matrix.node-version }}" | sed 's/\.x//').x | sudo -E bash -
-          sudo apt-get install -y nodejs
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-      - name: 📝 Install root dependencies
-        run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: 📝 Install dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund --ignore-scripts
       
       - name: 🧪 Run backend tests
         run: cd backend && npm test -- --passWithNoTests 2>/dev/null || true
