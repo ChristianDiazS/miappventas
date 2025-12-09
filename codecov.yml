@@ -1,0 +1,45 @@
+codecov:
+  require_ci_to_pass: yes
+  precision: 2
+  round: down
+  layout: "reach,diff,flags,tree"
+  branch: main
+
+coverage:
+  precision: 2
+  round: down
+  range:
+    - 80
+    - 100
+
+ignore:
+  - "node_modules"
+  - "dist"
+  - "build"
+  - "coverage"
+  - "__tests__"
+  - "test"
+
+flags:
+  frontend:
+    precision: 2
+    paths:
+      - "frontend/src"
+    carryforward: true
+  backend:
+    precision: 2
+    paths:
+      - "backend"
+    carryforward: true
+
+comment:
+  layout: "reach, diff, flags, tree"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  delete: false
+
+github:
+  checks:
+    annotations: true

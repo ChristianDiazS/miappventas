@@ -1,0 +1,41 @@
+{
+  "name": "miappventas-backend",
+  "version": "1.0.0",
+  "description": "Backend API para MiAppVentas - E-commerce Perú",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPatterns='__tests__/routes' --passWithNoTests",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --testPathPatterns='__tests__/routes' --passWithNoTests",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --testPathPatterns='__tests__/routes' --passWithNoTests"
+  },
+  "keywords": [
+    "e-commerce",
+    "api",
+    "rest"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "stripe": "^20.0.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@prisma/client": "^5.21.0",
+    "babel-jest": "^30.2.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.0.2",
+    "prisma": "^5.21.0",
+    "supertest": "^7.1.4"
+  }
+}

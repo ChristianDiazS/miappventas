@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect fill="white" width="200" height="200"/>
+  <circle cx="100" cy="100" r="90" fill="#06b6d4"/>
+  <text x="100" y="130" font-size="80" text-anchor="middle" fill="white">???</text>
+  <text x="100" y="170" font-size="24" text-anchor="middle" fill="#06b6d4" font-weight="bold">MiAppVentas</text>
+</svg>
