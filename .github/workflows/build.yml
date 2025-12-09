@@ -1,4 +1,4 @@
-name: Build & Deploy
+﻿name: Build & Deploy
 
 on:
   push:
@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
       
       - name: Install dependencies
         working-directory: ./frontend
@@ -58,7 +57,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
       
       - name: Install dependencies
         working-directory: ./backend
@@ -78,8 +76,8 @@ jobs:
     steps:
       - name: Notify Build Success
         run: |
-          echo "✅ Frontend and Backend builds completed successfully!"
-          echo "📦 Artifacts ready for deployment"
+          echo "âœ… Frontend and Backend builds completed successfully!"
+          echo "ðŸ“¦ Artifacts ready for deployment"
         
       # Slack notification disabled - add SLACK_WEBHOOK_URL secret to enable
       # - name: Send Slack Success Notification
@@ -87,14 +85,14 @@ jobs:
       #   with:
       #     payload: |
       #       {
-      #         "text": "✅ MiAppVentas Build Successful",
+      #         "text": "âœ… MiAppVentas Build Successful",
       #         "attachments": [
       #           {
       #             "color": "good",
       #             "fields": [
       #               {
       #                 "title": "Status",
-      #                 "value": "✅ All builds completed",
+      #                 "value": "âœ… All builds completed",
       #                 "short": true
       #               },
       #               {
@@ -104,12 +102,12 @@ jobs:
       #               },
       #               {
       #                 "title": "Frontend",
-      #                 "value": "✅ Built successfully",
+      #                 "value": "âœ… Built successfully",
       #                 "short": true
       #               },
       #               {
       #                 "title": "Backend",
-      #                 "value": "✅ Validated successfully",
+      #                 "value": "âœ… Validated successfully",
       #                 "short": true
       #               }
       #             ]
@@ -120,7 +118,7 @@ jobs:
       #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       #   continue-on-error: true
 
-      - name: ✅ Build notification
+      - name: âœ… Build notification
         run: echo "Build completed successfully"
 
   notify-failure:
@@ -134,14 +132,14 @@ jobs:
       #   with:
       #     payload: |
       #       {
-      #         "text": "❌ MiAppVentas Build Failed",
+      #         "text": "âŒ MiAppVentas Build Failed",
       #         "attachments": [
       #           {
       #             "color": "danger",
       #             "fields": [
       #               {
       #                 "title": "Status",
-      #                 "value": "❌ Build failed - check logs",
+      #                 "value": "âŒ Build failed - check logs",
       #                 "short": true
       #               },
       #               {
@@ -157,5 +155,7 @@ jobs:
       #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       #   continue-on-error: true
 
-      - name: ❌ Log build failure
+      - name: âŒ Log build failure
         run: echo "Build failed - check logs for details"
+
+

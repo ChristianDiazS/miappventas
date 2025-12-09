@@ -1,4 +1,4 @@
-name: Deploy - Staging
+﻿name: Deploy - Staging
 
 on:
   push:
@@ -33,39 +33,37 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: ðŸ“¦ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: 🔧 Install dependencies
+      - name: ðŸ”§ Install dependencies
         working-directory: backend
         run: npm ci
 
-      - name: 🗂️ Setup database
+      - name: ðŸ—‚ï¸ Setup database
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
         run: npm run prisma:migrate
 
-      - name: 🧪 Run all tests
+      - name: ðŸ§ª Run all tests
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
           NODE_ENV: test
         run: npm run test
 
-      - name: 🐳 Build Docker image
+      - name: ðŸ³ Build Docker image
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -f backend/Dockerfile backend/ || echo "Dockerfile not found"
           docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest -f backend/Dockerfile backend/ || echo "Building without Dockerfile"
 
-      - name: 📤 Push to container registry
+      - name: ðŸ“¤ Push to container registry
         if: success()
         run: |
           echo "Ready for deployment"
@@ -77,7 +75,7 @@ jobs:
     if: success()
     
     steps:
-      - name: 🚀 Deploy to staging
+      - name: ðŸš€ Deploy to staging
         run: |
           echo "Deploying to staging environment..."
           echo "Webhook: ${{ secrets.STAGING_WEBHOOK_URL }}"
@@ -90,5 +88,7 @@ jobs:
             echo "No staging webhook configured"
           fi
 
-      - name: ✅ Deployment complete
+      - name: âœ… Deployment complete
         run: echo "Staging deployment triggered"
+
+

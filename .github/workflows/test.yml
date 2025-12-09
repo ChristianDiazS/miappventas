@@ -1,4 +1,4 @@
-name: Tests CI/CD Pipeline
+﻿name: Tests CI/CD Pipeline
 
 on:
   push:
@@ -66,7 +66,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Tests passed! Check coverage reports above.'
+              body: 'âœ… Tests passed! Check coverage reports above.'
             })
         continue-on-error: true
 
@@ -123,10 +123,10 @@ jobs:
         id: status
         run: |
           if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.lint.result }}" == "success" ]; then
-            echo "status=✅ All checks passed!" >> $GITHUB_OUTPUT
+            echo "status=âœ… All checks passed!" >> $GITHUB_OUTPUT
             echo "color=good" >> $GITHUB_OUTPUT
           else
-            echo "status=⚠️ Some checks failed" >> $GITHUB_OUTPUT
+            echo "status=âš ï¸ Some checks failed" >> $GITHUB_OUTPUT
             echo "color=warning" >> $GITHUB_OUTPUT
           fi
       
@@ -164,6 +164,8 @@ jobs:
       #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       #   continue-on-error: true
 
-      - name: ✅ CI/CD Pipeline notification
+      - name: âœ… CI/CD Pipeline notification
         run: |
           echo "Pipeline execution completed successfully"
+
+

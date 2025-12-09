@@ -1,4 +1,4 @@
-name: CI/CD - MiAppVentas Tests
+﻿name: CI/CD - MiAppVentas Tests
 
 on:
   push:
@@ -35,21 +35,19 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: ðŸ“¦ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: 🔧 Install dependencies
+      - name: ðŸ”§ Install dependencies
         working-directory: backend
         run: npm ci
 
-      - name: 🗂️ Setup database
+      - name: ðŸ—‚ï¸ Setup database
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
@@ -57,14 +55,14 @@ jobs:
           npm run prisma:migrate || echo "Migration may have already run"
           npm run prisma:seed || echo "Seeding optional"
 
-      - name: 🧪 Run tests
+      - name: ðŸ§ª Run tests
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
           NODE_ENV: test
         run: npm run test -- --coverage --maxWorkers=2
 
-      - name: 📊 Upload coverage reports
+      - name: ðŸ“Š Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
           files: ./backend/coverage/coverage-final.json
@@ -72,39 +70,37 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: false
 
-      - name: 📈 Check test results
+      - name: ðŸ“ˆ Check test results
         if: failure()
         working-directory: backend
         run: |
-          echo "❌ Tests failed!"
+          echo "âŒ Tests failed!"
           npm run test -- --verbose
 
-      - name: ✅ Test Summary
+      - name: âœ… Test Summary
         if: always()
         working-directory: backend
         run: |
-          echo "✅ Tests completed"
+          echo "âœ… Tests completed"
           npm run test 2>&1 | grep -E "Test Suites|Tests:"
 
   lint:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: ðŸ“¦ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: 🔧 Install dependencies
+      - name: ðŸ”§ Install dependencies
         working-directory: backend
         run: npm ci
 
-      - name: 🎨 Run linter
+      - name: ðŸŽ¨ Run linter
         working-directory: backend
         continue-on-error: true
         run: npm run lint || echo "Linting completed"
@@ -128,34 +124,32 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: ðŸ“¦ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: 🔧 Install dependencies
+      - name: ðŸ”§ Install dependencies
         working-directory: backend
         run: npm ci
 
-      - name: 🗂️ Setup database
+      - name: ðŸ—‚ï¸ Setup database
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
         run: npm run prisma:migrate || echo "Migration optional"
 
-      - name: ⚡ Run performance tests
+      - name: âš¡ Run performance tests
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
           NODE_ENV: test
         run: npm run test -- __tests__/routes/performance.test.js
 
-      - name: 📋 Upload performance metrics
+      - name: ðŸ“‹ Upload performance metrics
         if: always()
         uses: actions/upload-artifact@v3
         with:
@@ -167,15 +161,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔐 Run security audit
+      - name: ðŸ” Run security audit
         working-directory: backend
         continue-on-error: true
         run: npm audit --audit-level=moderate
 
-      - name: 🛡️ Check for vulnerabilities with Snyk
+      - name: ðŸ›¡ï¸ Check for vulnerabilities with Snyk
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -202,33 +196,31 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: 📥 Checkout code
+      - name: ðŸ“¥ Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup Node.js
+      - name: ðŸ“¦ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: 🔧 Install dependencies
+      - name: ðŸ”§ Install dependencies
         working-directory: backend
         run: npm ci
 
-      - name: 🗂️ Setup database
+      - name: ðŸ—‚ï¸ Setup database
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
         run: npm run prisma:migrate || echo "Migration optional"
 
-      - name: 📊 Generate coverage report
+      - name: ðŸ“Š Generate coverage report
         working-directory: backend
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/miappventas_test
         run: npm run test -- --coverage
 
-      - name: 📈 Check coverage thresholds
+      - name: ðŸ“ˆ Check coverage thresholds
         working-directory: backend
         continue-on-error: true
         run: |
@@ -237,7 +229,7 @@ jobs:
             cat coverage/coverage-summary.json | grep -E "lines|functions|branches|statements" || true
           fi
 
-      - name: 📤 Upload coverage to Codecov
+      - name: ðŸ“¤ Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           files: ./backend/coverage/coverage-final.json
@@ -250,7 +242,7 @@ jobs:
     if: always()
     
     steps:
-      - name: 📝 Create summary
+      - name: ðŸ“ Create summary
         run: |
           echo "## CI/CD Pipeline Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -260,13 +252,15 @@ jobs:
           echo "- **Security Job**: ${{ needs.security.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Coverage Job**: ${{ needs.coverage.result }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: ❌ Notify on failure
+      - name: âŒ Notify on failure
         if: needs.test.result == 'failure'
         run: |
           echo "::error::Tests failed! Check the workflow run for details."
           exit 1
 
-      - name: ✅ Success notification
+      - name: âœ… Success notification
         if: needs.test.result == 'success'
         run: |
-          echo "✅ All checks passed!"
+          echo "âœ… All checks passed!"
+
+
