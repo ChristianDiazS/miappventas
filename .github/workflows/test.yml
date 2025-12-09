@@ -1,4 +1,4 @@
-﻿name: Tests CI/CD Pipeline
+﻿name: Tests CI/CD Pipeline (Fixed)
 
 on:
   push:
