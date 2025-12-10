@@ -1,16 +1,113 @@
-# React + Vite
+# 🎨 Frontend - MiAppVentas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación frontend desarrollada con React 18 y Vite para MiAppVentas.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📋 Descripción
 
-## React Compiler
+Interfaz de usuario moderna y responsiva para gestionar ventas, productos e inventario. Incluye componentes reutilizables, gestión de estado con hooks, y una experiencia de usuario intuitiva.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React 18** - UI library
+- **Vite** - Build tool y dev server
+- **React Router v7** - Client-side routing
+- **TailwindCSS v4** - Styling
+- **Jest** - Unit testing
+- **Axios** - HTTP client
+
+---
+
+## 📁 Estructura
+
+```
+frontend/
+├── src/
+│   ├── components/          # Componentes reutilizables
+│   ├── pages/               # Páginas/vistas
+│   ├── hooks/               # Custom React hooks
+│   ├── services/            # API calls
+│   ├── styles/              # CSS modules
+│   ├── App.jsx
+│   └── main.jsx
+├── public/                  # Archivos estáticos
+├── vite.config.js
+├── jest.config.js
+└── package.json
+```
+
+---
+
+## 🚀 Quick Start
+
+### Instalación
+
+```bash
+npm install --legacy-peer-deps
+```
+
+### Desarrollo
+
+```bash
+npm run dev
+```
+
+Servidor en `http://localhost:5173`
+
+### Build
+
+```bash
+npm run build
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+npm test                    # Ejecutar tests
+npm test -- --watch         # Watch mode
+npm test -- --coverage      # Con cobertura
+```
+
+**Coverage actual:** 86.3% ✓
+
+---
+
+## 📦 Características Principales
+
+✅ Autenticación JWT  
+✅ Dashboard interactivo  
+✅ Gestión de productos  
+✅ Carrito de compras  
+✅ Búsqueda y filtros  
+✅ Responsive design  
+✅ Manejo de errores  
+
+---
+
+## 📝 Scripts
+
+```bash
+npm run dev              # Desarrollo
+npm run build            # Build producción
+npm run preview          # Preview del build
+npm test                 # Tests
+npm run lint             # Linting
+npm run lint:fix         # Arreglar errores
+```
+
+---
+
+## 🔐 Variables de Entorno
+
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+---
+
+**Última actualización:** Diciembre 2025
