@@ -49,7 +49,7 @@ export function Header() {
         <div className="flex items-center justify-between gap-6">
           
           {/* Logo */}
-          <Link to="/" className="shrink-0 flex items-center py-1 px-3 rounded-lg bg-white/80 hover:bg-white/95 transition-all duration-200 backdrop-blur-sm">
+          <Link to="/" className="shrink-0 flex items-center py-1">
             <img 
               src="/images/logo/Logo-UnPoquitoVariado.png" 
               alt="Joyería Logo" 
