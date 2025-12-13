@@ -53,7 +53,7 @@ export function Header() {
             <img 
               src="/images/logo/Logo-UnPoquitoVariado.png" 
               alt="Joyería Logo" 
-              className="h-28 sm:h-32 lg:h-40 w-auto object-contain drop-shadow-md hover:drop-shadow-lg transition-all duration-200"
+              className="h-28 sm:h-32 lg:h-40 w-auto object-contain transition-all duration-200"
             />
           </Link>
 
