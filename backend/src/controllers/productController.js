@@ -48,10 +48,13 @@ export async function getAllProducts(req, res, next) {
       prisma.product.count({ where })
     ]);
     
-    // Transformar datos para devolver solo el nombre de categoria
+    // Transformar datos para devolver solo el nombre de categoria y agregar propiedad image
     const transformedProducts = products.map(product => ({
       ...product,
-      category: product.category?.name || 'General'
+      category: product.category?.name || 'General',
+      image: product.images && product.images.length > 0 
+        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+        : '/images/placeholder.svg'
     }));
     
     res.json({
@@ -89,10 +92,13 @@ export async function getProductById(req, res, next) {
       return next(new ApiError('Producto no encontrado', 404));
     }
     
-    // Transformar para devolver solo el nombre de categoria
+    // Transformar para devolver solo el nombre de categoria y agregar propiedad image
     const transformedProduct = {
       ...product,
-      category: product.category?.name || 'General'
+      category: product.category?.name || 'General',
+      image: product.images && product.images.length > 0 
+        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+        : '/images/placeholder.svg'
     };
     
     res.json({
@@ -158,10 +164,13 @@ export async function createProduct(req, res, next) {
       }
     });
     
-    // Transformar para devolver solo el nombre de categoria
+    // Transformar para devolver solo el nombre de categoria y agregar propiedad image
     const transformedProduct = {
       ...product,
-      category: product.category?.name || 'General'
+      category: product.category?.name || 'General',
+      image: product.images && product.images.length > 0 
+        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+        : '/images/placeholder.svg'
     };
     
     res.status(201).json({
@@ -219,10 +228,13 @@ export async function updateProduct(req, res, next) {
       }
     });
     
-    // Transformar para devolver solo el nombre de categoria
+    // Transformar para devolver solo el nombre de categoria y agregar propiedad image
     const transformedProduct = {
       ...updatedProduct,
-      category: updatedProduct.category?.name || 'General'
+      category: updatedProduct.category?.name || 'General',
+      image: updatedProduct.images && updatedProduct.images.length > 0 
+        ? updatedProduct.images.find(img => img.isPrimary)?.url || updatedProduct.images[0]?.url 
+        : '/images/placeholder.svg'
     };
     
     res.json({
