@@ -51,7 +51,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="shrink-0 flex items-center py-2">
             <img 
-              src="/images/logo/Logo-Página-Web-FT.png" 
+              src="/images/logo/Logo-UnPoquitoVariado.png" 
               alt="Joyería Logo" 
               className="h-16 sm:h-20 w-auto object-contain drop-shadow-md hover:drop-shadow-lg transition-all duration-200"
             />
