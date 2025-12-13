@@ -38,13 +38,11 @@ export function Home() {
   // Mapear imágenes locales según categoría
   const getProductImage = (category) => {
     const imageMap = {
-      'Laptops': '/images/products/laptop/product-laptop-001.jpeg',
-      'Monitores': '/images/products/monitor/product-monitor-001.jpeg',
-      'Periféricos': '/images/products/keyboard/product-keyboard-001.jpeg',
-      'Accesorios': '/images/products/headphones/product-headphones-001.jpeg',
-      'Mobiliario': '/images/products/chair/product-chair-001.jpeg'
+      'Joyería': '/images/placeholder.svg',
+      'Arreglos Florales': '/images/placeholder.svg',
+      'Decoración para el Baño': '/images/placeholder.svg'
     };
-    return imageMap[category] || '/images/products/laptop/product-laptop-001.jpeg';
+    return imageMap[category] || '/images/placeholder.svg';
   };
 
   const handleExploreCatalog = () => {
@@ -85,10 +83,10 @@ export function Home() {
       <section className="bg-linear-to-r from-cyan-500 to-blue-600 text-white py-16 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            🛍️ Bienvenido a MiAppVentas
+            ✨ Bienvenido a Un Poquito Variado
           </h1>
           <p className="text-xl mb-8 text-cyan-100">
-            Los mejores productos de electrónica al mejor precio
+            Joyas, arreglos florales y decoración para el baño de la más alta calidad
           </p>
           <Button 
             variant="primary" 

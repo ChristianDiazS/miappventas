@@ -142,7 +142,7 @@ export default function CheckoutPayment() {
                   <div className="space-y-2 text-sm font-mono bg-white p-3 rounded border border-gray-200 mb-4">
                     <p><strong>Banco:</strong> BCP</p>
                     <p><strong>Cuenta:</strong> 19209873456</p>
-                    <p><strong>Titular:</strong> MiAppVentas S.A.C.</p>
+                    <p><strong>Titular:</strong> Un Poquito Variado S.A.C.</p>
                     <p><strong>Monto:</strong> S/. {orderSummary.total.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   </div>
                   <Button

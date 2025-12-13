@@ -31,7 +31,7 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Contacto</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">Email: info@miappventas.com</li>
+              <li className="text-gray-400">Email: info@unpoquitovariado.com</li>
               <li className="text-gray-400">Tel: +51 999 999 999</li>
             </ul>
           </div>
@@ -39,7 +39,7 @@ export function Footer() {
 
         <div className="border-t border-gray-700 pt-8">
           <p className="text-center text-gray-400">
-            © 2025 MiAppVentas. Todos los derechos reservados.
+            © 2025 Un Poquito Variado. Todos los derechos reservados.
           </p>
         </div>
       </div>

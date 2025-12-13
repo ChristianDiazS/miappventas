@@ -81,7 +81,7 @@ export default function Login() {
       <div className="max-w-md w-full mx-auto">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">MiAppVentas</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Un Poquito Variado</h1>
           <p className="text-gray-600">Inicia sesión en tu cuenta</p>
         </div>
 
