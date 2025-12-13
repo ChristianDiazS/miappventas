@@ -44,16 +44,16 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header className="bg-white shadow-md sticky top-0 z-50 border-b-4 border-yellow-400">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center justify-between gap-6">
           
           {/* Logo */}
-          <Link to="/" className="shrink-0">
+          <Link to="/" className="shrink-0 flex items-center py-2">
             <img 
               src="/images/logo/Logo-Página-Web-FT.png" 
-              alt="MiAppVentas Logo" 
-              className="h-12 w-auto object-contain"
+              alt="Joyería Logo" 
+              className="h-16 sm:h-20 w-auto object-contain drop-shadow-md hover:drop-shadow-lg transition-all duration-200"
             />
           </Link>
 
