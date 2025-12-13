@@ -50,7 +50,11 @@ export function Header() {
           
           {/* Logo */}
           <Link to="/" className="shrink-0">
-            <h1 className="text-2xl font-bold text-cyan-500">MiAppVentas</h1>
+            <img 
+              src="/images/logo/Logo-Página-Web-FT.png" 
+              alt="MiAppVentas Logo" 
+              className="h-12 w-auto object-contain"
+            />
           </Link>
 
           {/* SearchBar */}
