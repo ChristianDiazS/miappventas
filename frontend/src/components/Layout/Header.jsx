@@ -69,6 +69,7 @@ export function Header() {
           <nav className="hidden lg:flex gap-6 items-center">
             <Link to="/" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors">Home</Link>
             <Link to="/products" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors">Productos</Link>
+            <Link to="/admin" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors bg-yellow-100 px-3 py-1 rounded-lg">⚙️ Admin</Link>
           </nav>
 
           {/* CartIcon y UserMenu */}

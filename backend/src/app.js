@@ -10,6 +10,7 @@ import orderRoutes from './routes/orders.js';
 import authRoutes from './routes/auth.js';
 import paymentRoutes from './routes/payments.js';
 import webhookRoutes from './routes/webhooks.js';
+import categoryRoutes from './routes/categories.js';
 
 export function createApp() {
   const app = express();
@@ -30,6 +31,7 @@ export function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/payments', paymentRoutes);
   app.use('/api/webhooks', webhookRoutes);
+  app.use('/api/categories', categoryRoutes);
 
   // Health check
   app.get('/api/health', (req, res) => {
