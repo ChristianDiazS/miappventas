@@ -1,0 +1,422 @@
+{
+  "info": {
+    "name": "Un Poquito Variado - SUPERADMIN API Testing",
+    "description": "Colección completa de tests para el Panel SUPERADMIN",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login SUPERADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set('token', pm.response.json().token);",
+                  "  pm.environment.set('userId', pm.response.json().user.id);",
+                  "  pm.test('✓ Token obtenido y guardado', function () {",
+                  "    pm.expect(pm.response.json().token).to.be.a('string');",
+                  "  });",
+                  "} else {",
+                  "  pm.test('✗ Error en login', function () { throw new Error('Login falló'); });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"superadmin@test.com\",\n  \"password\": \"superadmin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Dashboard",
+      "item": [
+        {
+          "name": "GET Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "GET System Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/dashboard/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "dashboard", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin Management",
+      "item": [
+        {
+          "name": "GET All Admins",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/admins?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "admins"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Create Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set('newAdminId', pm.response.json().id);",
+                  "  pm.test('✓ Admin creado', function () {",
+                  "    pm.expect(pm.response.json().id).to.be.a('number');",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newtestadmin@test.com\",\n  \"password\": \"TestPassword123!\",\n  \"firstName\": \"Nuevo\",\n  \"lastName\": \"Admin\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "admins"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"AdminActualizado\",\n  \"lastName\": \"Updated\",\n  \"role\": \"ADMIN\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/admins/{{newAdminId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "admins", "{{newAdminId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/admins/{{newAdminId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "admins", "{{newAdminId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Audit Logs",
+      "item": [
+        {
+          "name": "GET Audit Logs (Sin Filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/audit-logs?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "audit-logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Audit Logs (Filtro por Acción)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/audit-logs?page=1&limit=20&action=admin_created",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "audit-logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "action",
+                  "value": "admin_created"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Audit Logs (Filtro por Rango de Fechas)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/audit-logs?page=1&limit=20&startDate=2025-12-01&endDate=2025-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "audit-logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2025-12-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Reports",
+      "item": [
+        {
+          "name": "GET Reports (Últimos 30 días)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/reports?startDate=2025-11-16&endDate=2025-12-16",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "reports"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-11-16"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-16"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Reports (Rango Personalizado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/reports?startDate=2025-12-01&endDate=2025-12-16",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "reports"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-12-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-16"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Settings",
+      "item": [
+        {
+          "name": "GET Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "settings"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appName\": \"Un Poquito Variado Actualizado\",\n  \"maintenanceMode\": false,\n  \"maxProductsPerPage\": 12,\n  \"enableNewsletter\": true,\n  \"enableReviews\": true,\n  \"defaultCurrency\": \"PEN\",\n  \"defaultLanguage\": \"es\",\n  \"supportEmail\": \"support@unpoquitovariado.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "settings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Security Tests",
+      "item": [
+        {
+          "name": "GET Dashboard Sin Token (Debe fallar)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid_token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "GET Dashboard Con Token Expirado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/superadmin/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "superadmin", "dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "newAdminId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

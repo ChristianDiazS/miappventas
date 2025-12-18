@@ -273,3 +273,58 @@ export async function deleteProduct(req, res, next) {
     next(error);
   }
 }
+
+// Endpoint especial para admin: obtener TODOS los productos (activos e inactivos)
+export async function getAllProductsForAdmin(req, res, next) {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 50));
+    const skip = (pageNum - 1) * limitNum;
+    
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        skip,
+        take: limitNum,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          category: { select: { id: true, name: true } },
+          images: true
+        }
+      }),
+      prisma.product.count()
+    ]);
+    
+    // Transformar datos con estructura correcta para admin
+    const transformedProducts = products.map(product => ({
+      id: product.id,
+      sku: product.sku,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      stock: product.stock,
+      active: product.active,
+      category: product.category,
+      image: product.images && product.images.length > 0 
+        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+        : null,
+      images: product.images,
+      categoryId: product.categoryId
+    }));
+    
+    res.json({
+      success: true,
+      data: transformedProducts,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum)
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    next(error);
+  }
+}

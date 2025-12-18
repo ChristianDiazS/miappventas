@@ -35,14 +35,20 @@ export function Home() {
     }
   };
 
-  // Mapear imágenes locales según categoría
-  const getProductImage = (category) => {
+  // Mapear imágenes locales según categoría - SOLO como fallback
+  const getProductImage = (product) => {
+    // Si el producto tiene imagen de Cloudinary, usarla
+    if (product.image) {
+      return product.image;
+    }
+    
+    // Si no, usar placeholder según categoría
     const imageMap = {
       'Joyería': '/images/placeholder.svg',
       'Arreglos Florales': '/images/placeholder.svg',
       'Decoración para el Baño': '/images/placeholder.svg'
     };
-    return imageMap[category] || '/images/placeholder.svg';
+    return imageMap[product.category] || '/images/placeholder.svg';
   };
 
   const handleExploreCatalog = () => {
@@ -112,23 +118,23 @@ export function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map(product => (
-              <Card key={product._id} className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden flex flex-col">
+              <Card key={product.id} className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden flex flex-col">
                 <div 
                   className="bg-linear-to-br from-gray-200 to-gray-300 h-48 w-full flex items-center justify-center cursor-pointer hover:from-gray-300 hover:to-gray-400 transition duration-300 relative overflow-hidden"
-                  onClick={() => navigate(`/products/${product._id}`)}
+                  onClick={() => navigate(`/products/${product.id}`)}
                 >
                   <img
-                    src={getProductImage(product.category)}
-                    alt={product.name}
+                    src={getProductImage(product)}
+                    alt={product.title}
                     className="w-full h-full object-contain p-2"
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(product.name);
+                      e.target.src = 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(product.title);
                     }}
                   />
                 </div>
                 <div className="flex-1 p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900 flex-1 line-clamp-2">{product.name}</h3>
+                    <h3 className="font-semibold text-gray-900 flex-1 line-clamp-2">{product.title}</h3>
                     {product.originalPrice && (
                       <Badge variant="success" className="text-xs ml-2 shrink-0">
                         -

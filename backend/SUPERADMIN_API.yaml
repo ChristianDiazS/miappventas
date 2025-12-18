@@ -1,0 +1,591 @@
+openapi: 3.0.0
+info:
+  title: Un Poquito Variado - SUPERADMIN API
+  version: 1.0.0
+  description: API completa para administración de la plataforma e-commerce
+  contact:
+    name: API Support
+    email: support@unpoquitovariado.com
+
+servers:
+  - url: http://localhost:3001
+    description: Development Server
+  - url: https://api.unpoquitovariado.com
+    description: Production Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT Token. Obtener con POST /api/auth/login'
+
+  schemas:
+    DashboardStats:
+      type: object
+      required:
+        - summary
+        - thisMonth
+        - topProducts
+        - ordersByStatus
+        - paymentsByMethod
+      properties:
+        summary:
+          type: object
+          properties:
+            totalUsers:
+              type: integer
+              example: 45
+            activeUsers:
+              type: integer
+              example: 42
+            totalOrders:
+              type: integer
+              example: 120
+            totalRevenue:
+              type: integer
+              description: En centavos (ej. 100000 = S/. 1000)
+              example: 500000
+            avgOrderValue:
+              type: integer
+              example: 4166
+        thisMonth:
+          type: object
+          properties:
+            orders:
+              type: integer
+              example: 25
+            revenue:
+              type: integer
+              example: 150000
+        topProducts:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+              title:
+                type: string
+              sales:
+                type: integer
+              revenue:
+                type: integer
+        ordersByStatus:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED, REFUNDED]
+              _count:
+                type: integer
+              _sum:
+                type: object
+
+    Admin:
+      type: object
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN, SUPERADMIN]
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateAdminRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          example: newhmin@test.com
+        password:
+          type: string
+          format: password
+          example: SecurePass123!
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN, SUPERADMIN]
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+        action:
+          type: string
+          example: admin_created
+        entity:
+          type: string
+          example: user
+        entityId:
+          type: integer
+        previousData:
+          type: object
+          nullable: true
+        newData:
+          type: object
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Report:
+      type: object
+      properties:
+        dateRange:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+        dailyRevenue:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            '2025-12-15': 50000
+            '2025-12-16': 75000
+        topCustomers:
+          type: array
+          items:
+            type: object
+            properties:
+              userId:
+                type: integer
+              name:
+                type: string
+              email:
+                type: string
+                format: email
+              orders:
+                type: integer
+              totalSpent:
+                type: integer
+
+    Settings:
+      type: object
+      properties:
+        appName:
+          type: string
+        maintenanceMode:
+          type: boolean
+        maxProductsPerPage:
+          type: integer
+        enableNewsletter:
+          type: boolean
+        enableReviews:
+          type: boolean
+        defaultCurrency:
+          type: string
+          enum: [PEN, USD, EUR]
+        defaultLanguage:
+          type: string
+          enum: [es, en, pt]
+        supportEmail:
+          type: string
+          format: email
+        privacyPolicy:
+          type: string
+          format: uri
+        termsOfService:
+          type: string
+          format: uri
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      example:
+        error: 'Invalid request'
+
+    PaginatedResponse:
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+            pages:
+              type: integer
+
+paths:
+  # ==================== DASHBOARD ====================
+  /api/superadmin/dashboard/stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Obtener estadísticas del dashboard
+      description: Retorna KPIs en tiempo real (usuarios, órdenes, ingresos, top productos)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Estadísticas recuperadas exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+        '401':
+          description: No autenticado (token inválido o expirado)
+        '403':
+          description: No autorizado (requiere rol SUPERADMIN)
+
+  /api/superadmin/dashboard/health:
+    get:
+      tags:
+        - Dashboard
+      summary: Verificar salud del sistema
+      description: Retorna estado de la base de datos y sistema
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sistema OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  database:
+                    type: string
+                    example: connected
+                  timestamp:
+                    type: string
+                    format: date-time
+        '503':
+          description: Servicio no disponible (problema con DB)
+
+  # ==================== ADMIN MANAGEMENT ====================
+  /api/superadmin/admins:
+    get:
+      tags:
+        - Admin Management
+      summary: Listar todos los admins
+      description: Retorna lista paginada de usuarios con rol ADMIN o SUPERADMIN
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de admins
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admins:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Admin'
+                  pagination:
+                    $ref: '#/components/schemas/PaginatedResponse/properties/pagination'
+
+    post:
+      tags:
+        - Admin Management
+      summary: Crear nuevo admin
+      description: Crea un nuevo usuario con rol ADMIN o SUPERADMIN
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminRequest'
+      responses:
+        '201':
+          description: Admin creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '400':
+          description: Datos inválidos o email ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/superadmin/admins/{id}:
+    put:
+      tags:
+        - Admin Management
+      summary: Actualizar admin
+      description: Actualiza nombre, apellido, rol y estado del admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                role:
+                  type: string
+                  enum: [ADMIN, SUPERADMIN]
+                active:
+                  type: boolean
+      responses:
+        '200':
+          description: Admin actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '400':
+          description: Error (ej. intento eliminar único SUPERADMIN)
+
+    delete:
+      tags:
+        - Admin Management
+      summary: Eliminar admin
+      description: Elimina un admin (no se puede eliminar el único SUPERADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Admin eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin deleted successfully
+        '400':
+          description: No se puede eliminar (ej. único SUPERADMIN)
+
+  # ==================== AUDIT LOGS ====================
+  /api/superadmin/audit-logs:
+    get:
+      tags:
+        - Audit Logs
+      summary: Obtener audit logs
+      description: Retorna logs de todas las acciones en el sistema (paginado)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: action
+          in: query
+          description: Filtrar por acción (ej. admin_created, admin_updated)
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Filtrar por usuario que realizó la acción
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          description: Fecha inicio (ISO 8601)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Fecha fin (ISO 8601)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Audit logs recuperados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLog'
+                  pagination:
+                    $ref: '#/components/schemas/PaginatedResponse/properties/pagination'
+
+  # ==================== REPORTS ====================
+  /api/superadmin/reports:
+    get:
+      tags:
+        - Reports
+      summary: Generar reportes
+      description: Retorna reportes de ingresos diarios y top clientes por rango de fechas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          description: Fecha inicio (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          description: Fecha fin (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Reportes generados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          description: startDate y endDate son requeridos
+
+  # ==================== SETTINGS ====================
+  /api/superadmin/settings:
+    get:
+      tags:
+        - Settings
+      summary: Obtener configuración del sistema
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Configuración actual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+
+    put:
+      tags:
+        - Settings
+      summary: Actualizar configuración del sistema
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Configuración actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Settings updated successfully
+                  settings:
+                    $ref: '#/components/schemas/Settings'
+
+# ==================== SECURITY ====================
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Dashboard
+    description: Estadísticas y salud del sistema
+  - name: Admin Management
+    description: Crear, leer, actualizar y eliminar admins
+  - name: Audit Logs
+    description: Registros de auditoría de todas las acciones
+  - name: Reports
+    description: Reportes de ventas y análisis
+  - name: Settings
+    description: Configuración global del sistema

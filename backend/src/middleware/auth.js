@@ -18,10 +18,29 @@ export function authenticateToken(req, res, next) {
   }
 }
 
+// Alias para compatibilidad
+export function authenticate(req, res, next) {
+  return authenticateToken(req, res, next);
+}
+
 export function generateToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '15m' }
   );
+}
+
+export function authorize(requiredRole) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return next(new ApiError('Usuario no autenticado', 401));
+    }
+
+    if (req.user.role !== requiredRole) {
+      return next(new ApiError(`Se requiere rol ${requiredRole}`, 403));
+    }
+
+    next();
+  };
 }

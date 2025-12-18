@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getAllProducts,
+  getAllProductsForAdmin,
   getProductById,
   createProduct,
   updateProduct,
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // Rutas públicas
 router.get('/', getAllProducts);
+router.get('/admin/all', authenticateToken, getAllProductsForAdmin); // Endpoint para admin ANTES del /:id
 router.get('/:id', getProductById);
 
 // Rutas protegidas (solo admin)

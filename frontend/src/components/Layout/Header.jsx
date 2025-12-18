@@ -9,6 +9,7 @@ export function Header() {
   const navigate = useNavigate();
   const { cart } = useCart();
   const [itemCount, setItemCount] = useState(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Actualizar el contador inicial desde el carrito
@@ -33,6 +34,30 @@ export function Header() {
     };
   }, [cart]);
 
+  useEffect(() => {
+    // Cargar usuario del localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+
+    // Escuchar cambios de usuario (login/logout)
+    const handleUserUpdate = () => {
+      const updatedUserStr = localStorage.getItem('user');
+      if (updatedUserStr) {
+        setUser(JSON.parse(updatedUserStr));
+      } else {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
+  }, []);
+
   const handleSearch = (query) => {
     // Navegar a /products con el parámetro de búsqueda (incluyendo vacío)
     if (query.trim()) {
@@ -44,16 +69,16 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50 border-b-4 border-yellow-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <div className="flex items-center justify-between gap-6">
+    <header className="bg-white shadow-md sticky top-0 z-50 border-b-4 border-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-6" style={{ margin: '-2px 0' }}>
           
           {/* Logo */}
-          <Link to="/" className="shrink-0 flex items-center py-1">
+          <Link to="/" className="shrink-0 flex items-center">
             <img 
-              src="/images/logo/Logo-UnPoquitoVariado.png" 
+              src="/images/logo/Logo-UnPoquitoVariado2.png" 
               alt="Joyería Logo" 
-              className="h-32 sm:h-40 lg:h-48 w-auto object-contain transition-all duration-200"
+              className="h-20 sm:h-20 lg:h-26 w-auto object-contain transition-all duration-200"
             />
           </Link>
 
@@ -69,7 +94,9 @@ export function Header() {
           <nav className="hidden lg:flex gap-6 items-center">
             <Link to="/" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors">Home</Link>
             <Link to="/products" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors">Productos</Link>
-            <Link to="/admin" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors bg-yellow-100 px-3 py-1 rounded-lg">⚙️ Admin</Link>
+            {user && (user.role === 'ADMIN' || user.role === 'SUPERADMIN') && (
+              <Link to="/admin" className="text-gray-700 hover:text-cyan-500 font-medium transition-colors bg-yellow-100 px-3 py-1 rounded-lg">⚙️ Admin</Link>
+            )}
           </nav>
 
           {/* CartIcon y UserMenu */}

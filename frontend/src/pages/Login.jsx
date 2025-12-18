@@ -190,12 +190,6 @@ export default function Login() {
           </form>
         </Card>
 
-        {/* Info de demo */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-gray-600 mb-2"><strong>Demo:</strong> Usa cualquier email y contraseña para registrarte primero</p>
-          <p className="text-xs text-gray-600">O regístrate en la página de Register</p>
-        </div>
-
         {/* Links útiles */}
         <div className="mt-6 flex justify-center gap-4 text-sm">
           <button 

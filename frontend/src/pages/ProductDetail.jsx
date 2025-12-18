@@ -56,15 +56,18 @@ export function ProductDetail() {
     setIsFavorite(favorites.includes(id));
   };
 
-  const getProductImage = (category) => {
+  const getProductImage = () => {
+    // Si el producto tiene imágenes, devolver la primera
+    if (product?.images && product.images.length > 0) {
+      return product.images[selectedImage]?.url || product.images[0]?.url;
+    }
+    // Fallback a imagen por categoría
     const imageMap = {
-      'Laptops': '/images/products/laptop/product-laptop-001.jpeg',
-      'Monitores': '/images/products/monitor/product-monitor-001.jpeg',
-      'Periféricos': '/images/products/keyboard/product-keyboard-001.jpeg',
-      'Accesorios': '/images/products/headphones/product-headphones-001.jpeg',
-      'Mobiliario': '/images/products/chair/product-chair-001.jpeg'
+      'Joyería': '/images/placeholder.svg',
+      'Arreglos Florales': '/images/placeholder.svg',
+      'Decoración para el Baño': '/images/placeholder.svg'
     };
-    return imageMap[category] || '/images/products/laptop/product-laptop-001.jpeg';
+    return imageMap[product?.category] || '/images/placeholder.svg';
   };
 
   const handleQuantityChange = (e) => {
@@ -95,7 +98,7 @@ export function ProductDetail() {
     addToCart(itemToAdd);
     setToast({
       type: 'success',
-      message: `${product.name} x${quantity} agregado al carrito`
+      message: `${product.title} x${quantity} agregado al carrito`
     });
     setQuantity(1);
   };
@@ -208,7 +211,7 @@ export function ProductDetail() {
           items={[
             { label: 'Home', href: '/' },
             { label: 'Productos', href: '/products' },
-            { label: product.name }
+            { label: product.title }
           ]}
         />
 
@@ -218,8 +221,8 @@ export function ProductDetail() {
             {/* Imagen Principal - Más grande */}
             <div className="bg-linear-to-br from-gray-100 to-gray-200 w-full h-[400px] sm:h-[500px] lg:h-[600px] rounded-lg mb-6 sm:mb-8 flex items-center justify-center overflow-hidden shadow-lg p-2">
               <img
-                src={getProductImage(product.category)}
-                alt={product.name}
+                src={getProductImage()}
+                alt={product.title}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   e.target.src = '/images/placeholder.jpg';
@@ -228,22 +231,40 @@ export function ProductDetail() {
             </div>
 
             {/* Miniaturas */}
-            <div className="flex gap-2 sm:gap-3 justify-center">
-              <div
-                onClick={() => setSelectedImage(0)}
-                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg cursor-pointer border-2 overflow-hidden transition hover:shadow-md flex items-center justify-center bg-gray-50 ${
-                  selectedImage === 0 ? 'border-cyan-500 shadow-lg' : 'border-gray-300'
-                }`}
-              >
-                <img
-                  src={getProductImage(product.category)}
-                  alt={`${product.name} 1`}
-                  className="w-full h-full object-contain p-2 hover:opacity-75"
-                  onError={(e) => {
-                    e.target.src = '/images/placeholder.jpg';
-                  }}
-                />
-              </div>
+            <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
+              {product?.images && product.images.length > 0 ? (
+                product.images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg cursor-pointer border-2 overflow-hidden transition hover:shadow-md flex items-center justify-center bg-gray-50 ${
+                      selectedImage === idx ? 'border-cyan-500 shadow-lg' : 'border-gray-300'
+                    }`}
+                  >
+                    <img
+                      src={img.url}
+                      alt={`${product.title} ${idx + 1}`}
+                      className="w-full h-full object-contain p-2 hover:opacity-75"
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div
+                  className={`w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 overflow-hidden flex items-center justify-center bg-gray-50 border-gray-300`}
+                >
+                  <img
+                    src={getProductImage()}
+                    alt={`${product.title} 1`}
+                    className="w-full h-full object-contain p-2"
+                    onError={(e) => {
+                      e.target.src = '/images/placeholder.jpg';
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -252,7 +273,7 @@ export function ProductDetail() {
             {product.category && (
               <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">📁 {product.category}</p>
             )}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">{product.name}</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">{product.title}</h1>
 
             {/* Rating */}
             <div className="flex items-center gap-2 mb-4 sm:mb-6">

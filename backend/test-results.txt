@@ -1,0 +1,13 @@
+Starting tests...
+
+========== TESTING SUPERADMIN ENDPOINTS ==========
+
+[1/2] Testing Health...
+❌ FAIL - GET /api/health ()
+[2/2] Testing Login...
+❌ FAIL - POST /api/auth/login ()
+
+========== SUMMARY ==========
+Passed: 0/2
+Success Rate: 0%
+❌ SOME TESTS FAILED

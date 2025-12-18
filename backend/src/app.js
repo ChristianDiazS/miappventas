@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.js';
 import paymentRoutes from './routes/payments.js';
 import webhookRoutes from './routes/webhooks.js';
 import categoryRoutes from './routes/categories.js';
+import superadminRoutes from './routes/superadmin.js';
 
 export function createApp() {
   const app = express();
@@ -32,6 +33,7 @@ export function createApp() {
   app.use('/api/payments', paymentRoutes);
   app.use('/api/webhooks', webhookRoutes);
   app.use('/api/categories', categoryRoutes);
+  app.use('/api/superadmin', superadminRoutes);
 
   // Health check
   app.get('/api/health', (req, res) => {
