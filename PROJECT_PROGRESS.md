@@ -49,7 +49,7 @@
 
 ### Stack Principal
 ```
-Frontend: React 19.2 + Vite 7.3 (localhost:5174)
+Frontend: React 19.2 + Vite 7.3 (localhost:5173)
 Backend: Node.js + Express (localhost:5000)
 Base de datos: PostgreSQL + Prisma 5.21.0
 CDN de imágenes: Cloudinary (dy73lxudf)
