@@ -8,12 +8,13 @@ import { SkeletonLoader } from '../components/Common/SkeletonLoader';
 import { LazyImage } from '../components/Common/LazyImage';
 import { useCart } from '../hooks/useCart';
 import { usePersonalization } from '../context/PersonalizationContext';
+import ProductCard from '../components/Products/ProductCard';
 
 export function Products() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { addToCart } = useCart();
-  const { selectedItems, addToPersonalization } = usePersonalization();
+  const { selectedItems, componentImages, addToPersonalization } = usePersonalization();
   
   // Array con todas las imágenes de anillos disponibles
   const anilloImages = [
@@ -37,6 +38,11 @@ export function Products() {
     'img-dispensador11.jpg'
   ];
   
+  // Array con todas las imágenes de peluches disponibles
+  const peluchesImages = [
+    'g79yjcoxubuxu4pzkzpo'  // public_id de img-peluche1 en Cloudinary
+  ];
+  
   const [allProducts, setAllProducts] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -45,7 +51,6 @@ export function Products() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
-  const [showDecoracionIntro, setShowDecoracionIntro] = useState(false);
   const [showJoyeriaIntro, setShowJoyeriaIntro] = useState(false);
   const [sortBy, setSortBy] = useState('relevance');
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
@@ -93,6 +98,62 @@ export function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
+  // Mapear categorías a emojis
+  const categoryEmojis = {
+    'Joyería': '💍',
+    'Anillo': '💍',
+    'Collar': '📿',
+    'Dije': '✨',
+    'Arete': '👂',
+    'Decoración para el Baño': '🛁',
+    'Arreglos Florales': '🌸',
+    'Peluches': '🧸',
+    'Electrónica': '💻',
+    'Accesorios': '🎒',
+    'Monitores': '🖥️'
+  };
+
+  // Configuración de estilos para categorías especiales
+  const categoryStyles = {
+    'Decoración para el Baño': {
+      gradientFrom: 'from-cyan-500',
+      gradientVia: 'via-teal-500',
+      gradientTo: 'to-blue-500',
+      title: 'Transforma tu Baño en un Oasis',
+      description: 'Descubre nuestra exclusiva colección de accesorios y decoración para baño. Desde dispensadores elegantes hasta sets completos de tocador, tenemos todo lo que necesitas para crear un espacio de lujo y comodidad.',
+      features: '✨ Dispensadores de jabón | 🧴 Sets de baño | 🪥 Porta cepillos | 🛁 Accesorios decorativos | 🪞 Organizadores'
+    },
+    'Arreglos Florales': {
+      gradientFrom: 'from-pink-500',
+      gradientVia: 'via-rose-500',
+      gradientTo: 'to-red-500',
+      title: '🌸 Arreglos Florales Frescos',
+      description: 'Hermosos arreglos florales para eventos, decoración y regalos especiales. Cada pieza es diseñada con cuidado y amor.',
+      features: '🌹 Rosas frescas | 🌻 Girasoles | 💐 Arreglos mixtos | 🎁 Empaque especial | 🚚 Entrega a domicilio'
+    },
+    'Peluches': {
+      gradientFrom: 'from-cyan-500',
+      gradientVia: 'via-cyan-500',
+      gradientTo: 'to-blue-600',
+      title: '🧸 Peluches Adorables',
+      description: 'Encuentra el peluche perfecto para esa ocasión especial. Tenemos una gran variedad de tamaños y diseños para todas las edades.',
+      features: '🧸 Peluches suaves | 🎯 Diferentes tamaños | 💝 Perfecto para regalos | 🌈 Colores diversos | ✨ Materiales de calidad'
+    },
+    'Joyería': {
+      gradientFrom: 'from-amber-500',
+      gradientVia: 'via-yellow-500',
+      gradientTo: 'to-orange-500',
+      title: '💍 Joyería Elegante',
+      description: 'Joyas elegantes y sofisticadas: anillos, cadenas, pulseras, dijes, aretes y más.',
+      features: '✨ Diseños únicos | 💎 Materiales premium | 🎁 Regalos especiales | 🌟 Lujo asequible'
+    }
+  };
+
+  // Función para obtener el emoji de una categoría
+  const getCategoryEmoji = (category) => {
+    return categoryEmojis[category] || '📦';
+  };
+
   // Opciones de rango de precio predefinidas
   const pricePresets = {
     all: { label: '💰 Cualquier Precio', min: 0, max: 999999 },
@@ -127,44 +188,38 @@ export function Products() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/products?limit=100');
+      // Cargar categorías desde la API con estructura jerárquica
+      const categoriesResponse = await fetch('http://localhost:5000/api/categories');
+      if (categoriesResponse.ok) {
+        const categoriesData = await categoriesResponse.json();
+        
+        // Construir lista de todas las categorías (principales + subcategorías)
+        const allCategoryNames = [];
+        
+        categoriesData.forEach(mainCat => {
+          allCategoryNames.push(mainCat.name);
+          
+          // Agregar subcategorías si existen
+          if (mainCat.children && mainCat.children.length > 0) {
+            mainCat.children.forEach(subCat => {
+              allCategoryNames.push(subCat.name);
+            });
+          }
+        });
+        
+        setAllCategories(allCategoryNames);
+      }
+
+      const response = await fetch('http://localhost:5000/api/products?limit=1000');
       if (!response.ok) throw new Error('Error al cargar productos');
 
       const data = await response.json();
       let allProds = data.data || [];
 
-      // Para Anillos, generar productos dinámicamente usando las imágenes de Cloudinary
-      const generatedAnillos = anilloImages.map((imgName, index) => ({
-        id: `local-anillo-${index + 1}`,
-        title: `Anillo ${index + 1}`,
-        price: 45 + (index % 5) * 10, // Precios variados entre 45 y 85
-        image: `https://res.cloudinary.com/dy73lxudf/image/upload/c_limit,f_auto,q_auto,w_400/joyeria/anillos/img-anillo${index + 1}`,
-        category: 'Anillo',
-        stock: 5,
-        description: `Hermoso anillo de joyería - Diseño ${index + 1}`
-      }));
-
-      // Para Decoración para el Baño, generar productos dinámicamente
-      const generatedDecoracion = decoracionBanoImages.map((imgName, index) => ({
-        id: `local-decoracion-${index + 1}`,
-        title: `Dispensador Baño ${index + 1}`,
-        price: 35 + (index % 4) * 15, // Precios variados entre 35 y 80
-        image: `https://res.cloudinary.com/dy73lxudf/image/upload/c_limit,f_auto,q_auto,w_400/decoracion-para-bano/img-dispensador${index + 1}`,
-        category: 'Decoración para el Baño',
-        stock: 8,
-        description: `Hermoso accesorio de decoración para baño - Diseño ${index + 1}`
-      }));
-
-      // Mezclar productos de la API con anillos y decoración generados
-      // Remover anillos y decoración de la API si los hay
-      allProds = allProds.filter(p => p.category !== 'Anillo' && p.category !== 'Decoración para el Baño');
-      allProds = [...allProds, ...generatedAnillos, ...generatedDecoracion];
+      // Los productos ahora vienen de la base de datos (anillos, collares, combos, etc.)
+      // Ya no generamos anillos dinámicamente, vienen todos desde el servidor
 
       setAllProducts(allProds);
-
-      // Extraer categorías únicas de los productos
-      const categories = [...new Set(allProds.map(p => p.category))];
-      setAllCategories(categories);
     } catch (error) {
       console.error('Error:', error);
       setToast({
@@ -179,7 +234,7 @@ export function Products() {
   const applyFilters = () => {
     let filtered = [...allProducts];
 
-    // Filtrar por categoría
+    // Filtrar por categoría CON LÓGICA DE COMBOS INTELIGENTE
     if (selectedCategory) {
       if (selectedCategory === 'Joyería') {
         // Si selecciona Joyería, mostrar todos los productos de joyería
@@ -187,7 +242,39 @@ export function Products() {
           ['Collar', 'Dije', 'Arete', 'Anillo'].includes(product.category)
         );
       } else {
-        filtered = filtered.filter(product => product.category === selectedCategory);
+        // LÓGICA DE COMBOS INTELIGENTE
+        // Cuando filtra por una categoría, incluir:
+        // 1. Productos individuales de esa categoría
+        // 2. Combos que incluyan esa categoría (EXCEPTO para Dije que solo muestra individuales)
+        
+        const comboCategoryMap = {
+          'Collar': { collar: true },
+          'Dije': { dije: true },
+          'Arete': { arete: true },
+          'Anillo': { anillo: true }
+        };
+
+        const categoryKey = comboCategoryMap[selectedCategory];
+
+        filtered = filtered.filter(product => {
+          // Productos individuales de la categoría
+          if (product.category === selectedCategory) {
+            return true;
+          }
+
+          // Para Dije y Arete, NO mostrar combos - solo productos individuales
+          if (selectedCategory === 'Dije' || selectedCategory === 'Arete') {
+            return false;
+          }
+
+          // Combos que incluyen esta categoría
+          if (product.type === 'combo' && product.comboItems && categoryKey) {
+            const key = Object.keys(categoryKey)[0];
+            return product.comboItems[key] === true;
+          }
+
+          return false;
+        });
       }
     }
 
@@ -247,6 +334,29 @@ export function Products() {
     setPricePreset(preset);
     const { min, max } = pricePresets[preset];
     setPriceRange({ min, max });
+  };
+
+  // Función para renderizar sección introductoria dinámicamente
+  const renderCategoryIntro = () => {
+    if (!selectedCategory || !categoryStyles[selectedCategory]) {
+      return null;
+    }
+
+    const style = categoryStyles[selectedCategory];
+    
+    return (
+      <div className="mb-8">
+        <div className={`bg-gradient-to-r ${style.gradientFrom} ${style.gradientVia} ${style.gradientTo} rounded-2xl p-8 md:p-12 text-white shadow-lg mb-8`}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">{style.title}</h2>
+          <p className="text-cyan-50 text-lg md:text-xl mb-6">
+            {style.description}
+          </p>
+          <p className="text-cyan-100 text-base md:text-lg">
+            {style.features}
+          </p>
+        </div>
+      </div>
+    );
   };
 
   const handleAddToCart = (product) => {
@@ -350,21 +460,7 @@ export function Products() {
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
             {selectedCategory === null 
               ? 'Catálogo de Productos'
-              : selectedCategory === 'Joyería'
-              ? '💍 Joyería'
-              : selectedCategory === 'Decoración para el Baño'
-              ? '🛁 Decoración para el Baño'
-              : selectedCategory === 'Arreglos Florales'
-              ? '🌸 Arreglos Florales'
-              : selectedCategory === 'Collar'
-              ? '📿 Collar'
-              : selectedCategory === 'Dije'
-              ? '✨ Dije'
-              : selectedCategory === 'Arete'
-              ? '👂 Arete'
-              : selectedCategory === 'Anillo'
-              ? '💍 Anillo'
-              : 'Catálogo de Productos'
+              : `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`
             }
           </h1>
         </div>
@@ -403,7 +499,6 @@ export function Products() {
                   onClick={() => {
                     setSelectedCategory(null);
                     setExpandedCategory(null);
-                    setShowDecoracionIntro(false);
                   }}
                   className={`w-full text-left px-4 py-2 rounded-lg mb-2 transition-colors ${
                     selectedCategory === null
@@ -414,54 +509,77 @@ export function Products() {
                   👁️ Ver Todos
                 </button>
 
-                {/* Categorías principales */}
+                {/* Categorías renderizadas dinámicamente CON ESTRUCTURA JERÁRQUICA */}
                 <div className="space-y-2">
-                  {/* Decoración para Baño - Link directo */}
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('Decoración para el Baño');
-                      setShowDecoracionIntro(true);
-                      setExpandedCategory(null);
-                    }}
-                    className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
-                      selectedCategory === 'Decoración para el Baño'
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    🛁 Decoración para el Baño
-                  </button>
-
-                  {/* Arreglos Florales */}
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('Arreglos Florales');
-                      setShowDecoracionIntro(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
-                      selectedCategory === 'Arreglos Florales'
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    🌸 Arreglos Florales
-                  </button>
-
-                  {/* Joyería - Link directo (sin ir a otra página) */}
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('Joyería');
-                      setShowJoyeriaIntro(true);
-                      setExpandedCategory(null);
-                    }}
-                    className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
-                      selectedCategory === 'Joyería'
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    💍 Joyería
-                  </button>
+                  {allCategories && allCategories.length > 0 ? (
+                    <>
+                      {/* Renderizar Joyería especialmente con subcategorías expandibles */}
+                      {allCategories.includes('Joyería') && (
+                        <div>
+                          <button
+                            onClick={() => {
+                              setSelectedCategory('Joyería');
+                              setShowJoyeriaIntro(true);
+                              setExpandedCategory(expandedCategory === 'Joyería' ? null : 'Joyería');
+                            }}
+                            className={`w-full text-left px-4 py-2 rounded-lg transition-all flex items-center justify-between ${
+                              selectedCategory === 'Joyería'
+                                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            <span>💍 Joyería</span>
+                            <span className={`transition-transform ${expandedCategory === 'Joyería' ? 'rotate-180' : ''}`}>
+                              ▼
+                            </span>
+                          </button>
+                          
+                          {/* Subcategorías expandibles */}
+                          {expandedCategory === 'Joyería' && (
+                            <div className="ml-4 mt-2 space-y-2">
+                              {['Collar', 'Dije', 'Arete', 'Anillo'].map((subcat) => (
+                                <button
+                                  key={subcat}
+                                  onClick={() => {
+                                    setSelectedCategory(subcat);
+                                    setShowJoyeriaIntro(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-2 rounded-lg transition-all text-sm ${
+                                    selectedCategory === subcat
+                                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  }`}
+                                >
+                                  {getCategoryEmoji(subcat)} {subcat}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Otras categorías (no Joyería) */}
+                      {allCategories.filter(cat => cat !== 'Joyería' && !['Anillo', 'Collar', 'Dije', 'Arete'].includes(cat)).map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            setSelectedCategory(category);
+                            setShowJoyeriaIntro(false);
+                            setExpandedCategory(null);
+                          }}
+                          className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
+                            selectedCategory === category
+                              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-600 hover:to-blue-700'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {getCategoryEmoji(category)} {category}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <div className="text-gray-500 text-sm text-center py-2">Cargando categorías...</div>
+                  )}
                 </div>
               </Card>
 
@@ -539,23 +657,10 @@ export function Products() {
               </div>
             )}
 
-            {/* Sección Introductoria - Decoración para el Baño */}
-            {showDecoracionIntro && selectedCategory === 'Decoración para el Baño' && (
-              <div className="mb-8">
-                {/* Introducción con gradiente */}
-                <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-500 rounded-2xl p-8 md:p-12 text-white shadow-lg mb-8">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-3">🛁 Transforma tu Baño en un Oasis</h2>
-                  <p className="text-cyan-50 text-lg md:text-xl mb-6">
-                    Descubre nuestra exclusiva colección de accesorios y decoración para baño. Desde dispensadores elegantes hasta sets completos de tocador, tenemos todo lo que necesitas para crear un espacio de lujo y comodidad.
-                  </p>
-                  <p className="text-cyan-100 text-base md:text-lg">
-                    ✨ Dispensadores de jabón | 🧴 Sets de baño | 🪥 Porta cepillos | 🛁 Accesorios decorativos | 🪞 Organizadores
-                  </p>
-                </div>
-              </div>
-            )}
+            {/* Sección Introductoria Dinámica */}
+            {renderCategoryIntro()}
 
-            {/* Sección Introductoria - Joyería con Carrusel */}
+            {/* Sección Introductoria - Joyería con Carrusel (Especial) */}
             {showJoyeriaIntro && selectedCategory === 'Joyería' && (
               <div className="mb-8">
                 {/* Carrusel de referencia */}
@@ -603,10 +708,10 @@ export function Products() {
 
             {/* Sección de Personalización - Aparece en Joyería o subcategorías */}
             {(selectedCategory === 'Joyería' || selectedCategory === 'Anillo' || selectedCategory === 'Collar' || selectedCategory === 'Dije' || selectedCategory === 'Arete') && (
-              <div className="mb-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-6 md:p-8 text-white shadow-lg">
+              <div id="personalization-section" className="mb-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-6 md:p-8 text-white shadow-lg">
                 <div className="mb-6">
                   <h2 className="text-2xl md:text-3xl font-bold mb-2">🎁 Tu Juego Personalizado</h2>
-                  <p className="text-cyan-100 text-sm md:text-base mb-4">Selecciona una pieza de cada tipo para crear tu combinación única. Al completar tu juego, obtendrás un 18% de descuento.</p>
+                  <p className="text-cyan-100 text-sm md:text-base mb-4">Selecciona las piezas que desees para crear tu combinación única. Obtén hasta 18% de descuento al completar tu juego.</p>
                 </div>
 
                 {/* Grid de imágenes seleccionadas */}
@@ -616,7 +721,7 @@ export function Products() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-lg overflow-hidden flex items-center justify-center mb-2 border-2 border-white/50">
                       {selectedItems.collar ? (
                         <LazyImage
-                          src={getProductImage(selectedItems.collar)}
+                          src={componentImages.collar || getProductImage(selectedItems.collar)}
                           alt={selectedItems.collar.title}
                           className="w-full h-full object-cover p-1"
                         />
@@ -627,7 +732,6 @@ export function Products() {
                     <button
                       onClick={() => {
                         setSelectedCategory('Collar');
-                        setShowDecoracionIntro(false);
                       }}
                       className={`px-2 py-1.5 rounded-lg transition-all text-xs font-semibold ${
                         selectedCategory === 'Collar'
@@ -644,7 +748,7 @@ export function Products() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-lg overflow-hidden flex items-center justify-center mb-2 border-2 border-white/50">
                       {selectedItems.dije ? (
                         <LazyImage
-                          src={getProductImage(selectedItems.dije)}
+                          src={componentImages.dije || getProductImage(selectedItems.dije)}
                           alt={selectedItems.dije.title}
                           className="w-full h-full object-cover p-1"
                         />
@@ -655,7 +759,6 @@ export function Products() {
                     <button
                       onClick={() => {
                         setSelectedCategory('Dije');
-                        setShowDecoracionIntro(false);
                       }}
                       className={`px-2 py-1.5 rounded-lg transition-all text-xs font-semibold ${
                         selectedCategory === 'Dije'
@@ -672,7 +775,7 @@ export function Products() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-lg overflow-hidden flex items-center justify-center mb-2 border-2 border-white/50">
                       {selectedItems.arete ? (
                         <LazyImage
-                          src={getProductImage(selectedItems.arete)}
+                          src={componentImages.arete || getProductImage(selectedItems.arete)}
                           alt={selectedItems.arete.title}
                           className="w-full h-full object-cover p-1"
                         />
@@ -683,7 +786,6 @@ export function Products() {
                     <button
                       onClick={() => {
                         setSelectedCategory('Arete');
-                        setShowDecoracionIntro(false);
                       }}
                       className={`px-2 py-1.5 rounded-lg transition-all text-xs font-semibold ${
                         selectedCategory === 'Arete'
@@ -700,7 +802,7 @@ export function Products() {
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 rounded-lg overflow-hidden flex items-center justify-center mb-2 border-2 border-white/50">
                       {selectedItems.anillo ? (
                         <LazyImage
-                          src={getProductImage(selectedItems.anillo)}
+                          src={componentImages.anillo || getProductImage(selectedItems.anillo)}
                           alt={selectedItems.anillo.title}
                           className="w-full h-full object-cover p-1"
                         />
@@ -711,7 +813,6 @@ export function Products() {
                     <button
                       onClick={() => {
                         setSelectedCategory('Anillo');
-                        setShowDecoracionIntro(false);
                       }}
                       className={`px-2 py-1.5 rounded-lg transition-all text-xs font-semibold ${
                         selectedCategory === 'Anillo'
@@ -728,8 +829,15 @@ export function Products() {
                 <div className="bg-white/10 rounded-lg p-4 mb-6 text-center">
                   <p className="text-sm font-semibold">
                     {selectedItems.collar && selectedItems.dije && selectedItems.arete && selectedItems.anillo
-                      ? '✅ ¡Juego completo! Listo para finalizar'
-                      : `⏳ ${[selectedItems.collar, selectedItems.dije, selectedItems.arete, selectedItems.anillo].filter(Boolean).length}/4 piezas seleccionadas`}
+                      ? '✅ ¡Juego completo! 4/4 piezas - 18% de descuento'
+                      : (() => {
+                          const count = [selectedItems.collar, selectedItems.dije, selectedItems.arete, selectedItems.anillo].filter(Boolean).length;
+                          const maxCount = 4;
+                          return count === 0 
+                            ? `⏳ Comienza a seleccionar piezas`
+                            : `⏳ ${count}/${maxCount} piezas seleccionadas`;
+                        })()
+                    }
                   </p>
                 </div>
 
@@ -778,87 +886,43 @@ export function Products() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                   {getPaginatedProducts().map(product => (
-                    <Card
+                    <ProductCard
                       key={product.id}
-                      className="hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full border border-gray-200"
-                    >
-                      {/* Imagen */}
-                      <div
-                        className="bg-white h-56 sm:h-64 w-full cursor-pointer hover:bg-gray-50 transition duration-300 relative overflow-hidden flex items-center justify-center"
-                        onClick={() => navigate(`/products/${product.id}`)}
-                      >
-                        <LazyImage
-                          src={getProductImage(product)}
-                          alt={product.title}
-                          className="w-full h-full object-contain p-4"
-                          onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(product.title);
-                          }}
-                        />
-                      </div>
-
-                      {/* Contenido */}
-                      <div className="p-3 md:p-4 flex flex-col flex-1">
-                        <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1 text-xs md:text-sm hover:text-cyan-600 transition">
-                          {product.title}
-                        </h3>
-                        <p className="text-xs text-gray-500 mb-2 md:mb-3 capitalize">
-                          🏷️ {product.category}
-                        </p>
+                      product={product}
+                      selectedCategory={selectedCategory}
+                      onAddToCart={(productWithSize) => {
+                        handleAddToCart(productWithSize);
+                      }}
+                      onAddToPersonalization={(categoryType, product) => {
+                        addToPersonalization(categoryType, product);
                         
-                        {/* Precio */}
-                        <div className="mb-2 md:mb-3 py-2 bg-cyan-50 rounded px-2 text-center border border-cyan-200">
-                          <p className="text-cyan-700 font-bold text-sm md:text-lg">
-                            S/. {product.price.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
+                        // Mostrar notificación
+                        let mensaje = '';
+                        if (product.type === 'combo' && product.comboItems) {
+                          const piezas = [];
+                          if (product.comboItems.collar) piezas.push('Collar');
+                          if (product.comboItems.dije) piezas.push('Dije');
+                          if (product.comboItems.arete) piezas.push('Arete');
+                          if (product.comboItems.anillo) piezas.push('Anillo');
+                          mensaje = `✨ ${piezas.join(' + ')} agregado a Tu Juego Personalizado`;
+                        } else {
+                          mensaje = `✨ ${product.title} agregado a Tu Juego Personalizado`;
+                        }
+                        
+                        setToast({
+                          type: 'success',
+                          message: mensaje
+                        });
 
-                        {/* Stock */}
-                        <div className="mb-3 md:mb-4">
-                          {product.stock > 0 ? (
-                            <Badge variant="success" className="text-xs w-full text-center">
-                              ✓ Stock: {product.stock} disponibles
-                            </Badge>
-                          ) : (
-                            <Badge className="text-xs bg-red-500 text-white w-full text-center">
-                              ❌ Agotado
-                            </Badge>
-                          )}
-                        </div>
-
-                        {/* Botones */}
-                        <div className="flex flex-col gap-2 mt-auto">
-                          {/* Botón Agregar a Personalizado - Solo en Joyería */}
-                          {(selectedCategory === 'Collar' || selectedCategory === 'Dije' || selectedCategory === 'Arete' || selectedCategory === 'Anillo') && product.stock > 0 && (
-                            <Button
-                              fullWidth
-                              disabled={product.stock === 0}
-                              onClick={() => {
-                                const categoryKey = selectedCategory.toLowerCase();
-                                addToPersonalization(selectedCategory, product);
-                                setToast({
-                                  type: 'success',
-                                  message: `${product.title} agregado a Personalizado`
-                                });
-                              }}
-                              className="text-xs md:text-sm bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold"
-                            >
-                              ✨ Agregar a Personalizado
-                            </Button>
-                          )}
-
-                          {/* Botón Carrito */}
-                          <Button
-                            fullWidth
-                            disabled={product.stock === 0}
-                            onClick={() => handleAddToCart(product)}
-                            className="text-xs md:text-sm"
-                          >
-                            {product.stock > 0 ? '🛒 Añadir al Carrito' : 'Agotado'}
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
+                        // Desplazarse a la sección de "Tu Juego Personalizado"
+                        setTimeout(() => {
+                          const personalizationSection = document.getElementById('personalization-section');
+                          if (personalizationSection) {
+                            personalizationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 300);
+                      }}
+                    />
                   ))}
                 </div>
 

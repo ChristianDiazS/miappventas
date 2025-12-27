@@ -66,13 +66,22 @@ model Category {
   name          String          @unique
   slug          String          @unique
   description   String?
+  image         String?         // URL de imagen/banner
   active        Boolean         @default(true)
+  
+  // Estructura jerárquica (opcional)
+  parentId      Int?            // null = categoría principal
+  parent        Category?       @relation("ParentChild", fields: [parentId], references: [id], onDelete: SetNull)
+  children      Category[]      @relation("ParentChild")
+  
   createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
   
   // Relations
   products      Product[]
   
   @@index([slug])
+  @@index([parentId])
 }
 
 // ============== PRODUCTS ==============
@@ -92,6 +101,15 @@ model Product {
   active        Boolean         @default(true)
   rating        Float           @default(0)
   reviewCount   Int             @default(0)
+  
+  // Campos para productos combinados
+  type          String          @default("individual")  // "individual" o "combo"
+  comboItems    Json?           // { collar: true, dije: true, arete: false, anillo: false }
+  
+  // Campos para variantes (tallas, colores, etc)
+  image         String?         // imagen principal
+  sizes         Json?           // ["S", "M", "L", "XL"]
+  selectedSize  String?         // talla seleccionada por defecto
   
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt

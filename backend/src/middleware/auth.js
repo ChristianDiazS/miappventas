@@ -31,14 +31,17 @@ export function generateToken(user) {
   );
 }
 
-export function authorize(requiredRole) {
+export function authorize(requiredRoles) {
   return (req, res, next) => {
     if (!req.user) {
       return next(new ApiError('Usuario no autenticado', 401));
     }
 
-    if (req.user.role !== requiredRole) {
-      return next(new ApiError(`Se requiere rol ${requiredRole}`, 403));
+    // Si requiredRoles es un string, convertir a array
+    const rolesArray = typeof requiredRoles === 'string' ? [requiredRoles] : requiredRoles;
+
+    if (!rolesArray.includes(req.user.role)) {
+      return next(new ApiError(`Se requiere uno de estos roles: ${rolesArray.join(', ')}`, 403));
     }
 
     next();

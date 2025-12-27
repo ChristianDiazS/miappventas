@@ -76,7 +76,7 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="shrink-0 flex items-center">
             <img 
-              src="/images/logo/Logo-UnPoquitoVariado2.png" 
+              src="/images/logo/Logo-UnPoquitoVariado3.PNG" 
               alt="Joyería Logo" 
               className="h-20 sm:h-20 lg:h-26 w-auto object-contain transition-all duration-200"
             />

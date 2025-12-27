@@ -5,11 +5,22 @@ const prisma = new PrismaClient();
 // Obtener todas las categorías
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await prisma.category.findMany({
+    // Obtener solo categorías principales (parentId es null)
+    const mainCategories = await prisma.category.findMany({
+      where: {
+        parentId: null,
+        active: true
+      },
+      include: {
+        children: {
+          where: { active: true },
+          orderBy: { name: 'asc' }
+        }
+      },
       orderBy: { name: 'asc' }
     });
 
-    res.json(categories);
+    res.json(mainCategories);
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ error: 'Error fetching categories' });
@@ -39,7 +50,7 @@ export const getCategoryById = async (req, res) => {
 // Crear una nueva categoría (solo admin)
 export const createCategory = async (req, res) => {
   try {
-    const { name, description, slug } = req.body;
+    const { name, description, slug, image } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
@@ -52,7 +63,8 @@ export const createCategory = async (req, res) => {
       data: {
         name,
         description: description || '',
-        slug: categorySlug
+        slug: categorySlug,
+        image: image || null
       }
     });
 
@@ -70,14 +82,15 @@ export const createCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, slug } = req.body;
+    const { name, description, slug, image } = req.body;
 
     const category = await prisma.category.update({
       where: { id: parseInt(id) },
       data: {
         ...(name && { name }),
         ...(description && { description }),
-        ...(slug && { slug })
+        ...(slug && { slug }),
+        ...(image && { image })
       }
     });
 

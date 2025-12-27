@@ -1,0 +1,59 @@
+
+// Cambiar estado del producto (activar/desactivar)
+export async function toggleProductStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const productId = parseInt(id);
+
+    if (!productId) {
+      return res.status(400).json({ message: 'ID de producto inválido' });
+    }
+
+    // Obtener el producto actual
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { images: true }
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Cambiar el estado
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: { active: !product.active },
+      include: {
+        category: { select: { id: true, name: true } },
+        images: true
+      }
+    });
+
+    // Transformar datos
+    const transformedProduct = {
+      id: updatedProduct.id,
+      sku: updatedProduct.sku,
+      title: updatedProduct.title,
+      description: updatedProduct.description,
+      price: updatedProduct.price,
+      originalPrice: updatedProduct.originalPrice,
+      stock: updatedProduct.stock,
+      active: updatedProduct.active,
+      category: updatedProduct.category,
+      image: updatedProduct.images && updatedProduct.images.length > 0 
+        ? updatedProduct.images.find(img => img.isPrimary)?.url || updatedProduct.images[0]?.url 
+        : null,
+      images: updatedProduct.images,
+      categoryId: updatedProduct.categoryId
+    };
+
+    res.json({
+      success: true,
+      message: `Producto ${updatedProduct.active ? 'activado' : 'desactivado'} correctamente`,
+      data: transformedProduct,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    next(error);
+  }
+}

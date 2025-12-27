@@ -10,6 +10,13 @@ export function PersonalizationProvider({ children }) {
     anillo: null
   });
 
+  const [componentImages, setComponentImages] = useState({
+    collar: null,
+    dije: null,
+    arete: null,
+    anillo: null
+  });
+
   const [totalDiscount] = useState(0.18); // 18% discount
 
   const addToPersonalization = (category, product) => {
@@ -17,6 +24,14 @@ export function PersonalizationProvider({ children }) {
       ...prev,
       [category.toLowerCase()]: product
     }));
+
+    // Si hay una imagen específica para este componente, guardarla
+    if (product.componentImage) {
+      setComponentImages(prev => ({
+        ...prev,
+        [category.toLowerCase()]: product.componentImage
+      }));
+    }
   };
 
   const removeFromPersonalization = (category) => {
@@ -24,10 +39,20 @@ export function PersonalizationProvider({ children }) {
       ...prev,
       [category.toLowerCase()]: null
     }));
+    setComponentImages(prev => ({
+      ...prev,
+      [category.toLowerCase()]: null
+    }));
   };
 
   const clearPersonalization = () => {
     setSelectedItems({
+      collar: null,
+      dije: null,
+      arete: null,
+      anillo: null
+    });
+    setComponentImages({
       collar: null,
       dije: null,
       arete: null,
@@ -53,6 +78,7 @@ export function PersonalizationProvider({ children }) {
 
   const value = {
     selectedItems,
+    componentImages,
     addToPersonalization,
     removeFromPersonalization,
     clearPersonalization,

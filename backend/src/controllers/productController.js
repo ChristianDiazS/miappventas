@@ -5,7 +5,7 @@ export async function getAllProducts(req, res, next) {
   try {
     const { category, minPrice, maxPrice, search, page = 1, limit = 12 } = req.query;
     const pageNum = Math.max(1, parseInt(page) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 12));
+    const limitNum = Math.min(1000, Math.max(1, parseInt(limit) || 12));
     const skip = (pageNum - 1) * limitNum;
     
     // Construir where con filtros
@@ -52,9 +52,11 @@ export async function getAllProducts(req, res, next) {
     const transformedProducts = products.map(product => ({
       ...product,
       category: product.category?.name || 'General',
-      image: product.images && product.images.length > 0 
-        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-        : '/images/placeholder.svg'
+      image: product.image && product.image.trim() 
+        ? product.image  // Usar el campo image directo si existe
+        : (product.images && product.images.length > 0 
+          ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+          : '/images/placeholder.svg')
     }));
     
     res.json({
@@ -96,9 +98,11 @@ export async function getProductById(req, res, next) {
     const transformedProduct = {
       ...product,
       category: product.category?.name || 'General',
-      image: product.images && product.images.length > 0 
-        ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
-        : '/images/placeholder.svg'
+      image: product.image && product.image.trim() 
+        ? product.image  // Usar el campo image directo si existe
+        : (product.images && product.images.length > 0 
+          ? product.images.find(img => img.isPrimary)?.url || product.images[0]?.url 
+          : '/images/placeholder.svg')
     };
     
     res.json({
@@ -277,9 +281,9 @@ export async function deleteProduct(req, res, next) {
 // Endpoint especial para admin: obtener TODOS los productos (activos e inactivos)
 export async function getAllProductsForAdmin(req, res, next) {
   try {
-    const { page = 1, limit = 50 } = req.query;
+    const { page = 1, limit = 1000 } = req.query;
     const pageNum = Math.max(1, parseInt(page) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 50));
+    const limitNum = Math.min(10000, Math.max(1, parseInt(limit) || 1000));
     const skip = (pageNum - 1) * limitNum;
     
     const [products, total] = await Promise.all([
@@ -294,6 +298,8 @@ export async function getAllProductsForAdmin(req, res, next) {
       }),
       prisma.product.count()
     ]);
+    
+    console.log(`[Admin Products] Total en BD: ${total}, Retornando: ${products.length}, page: ${pageNum}, limit: ${limitNum}`);
     
     // Transformar datos con estructura correcta para admin
     const transformedProducts = products.map(product => ({
@@ -328,3 +334,63 @@ export async function getAllProductsForAdmin(req, res, next) {
     next(error);
   }
 }
+
+// Cambiar estado del producto (activar/desactivar)
+export async function toggleProductStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const productId = parseInt(id);
+
+    if (!productId) {
+      return res.status(400).json({ message: 'ID de producto inválido' });
+    }
+
+    // Obtener el producto actual
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { images: true }
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Cambiar el estado
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: { active: !product.active },
+      include: {
+        category: { select: { id: true, name: true } },
+        images: true
+      }
+    });
+
+    // Transformar datos
+    const transformedProduct = {
+      id: updatedProduct.id,
+      sku: updatedProduct.sku,
+      title: updatedProduct.title,
+      description: updatedProduct.description,
+      price: updatedProduct.price,
+      originalPrice: updatedProduct.originalPrice,
+      stock: updatedProduct.stock,
+      active: updatedProduct.active,
+      category: updatedProduct.category,
+      image: updatedProduct.images && updatedProduct.images.length > 0 
+        ? updatedProduct.images.find(img => img.isPrimary)?.url || updatedProduct.images[0]?.url 
+        : null,
+      images: updatedProduct.images,
+      categoryId: updatedProduct.categoryId
+    };
+
+    res.json({
+      success: true,
+      message: `Producto ${updatedProduct.active ? 'activado' : 'desactivado'} correctamente`,
+      data: transformedProduct,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
