@@ -1,10 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import { ErrorBoundary as ErrorBoundaryComponent } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PersonalizationProvider } from './context/PersonalizationContext';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import CookieConsent from './components/CookieConsent';
+import { ErrorBoundary, initializeSentryReact } from './config/sentry';
 import { Home } from './pages/Home';
 import { Products } from './pages/Products';
 import { ProductDetail } from './pages/ProductDetail';
@@ -27,27 +28,31 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Contact from './pages/Contact';
 
+// Initialize Sentry error tracking
+initializeSentryReact();
+
 export default function App() {
   return (
     <ErrorBoundary>
-      <PersonalizationProvider>
-        <div className="min-h-screen flex flex-col bg-white">
-          <Header />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/decoracion-bano" element={<DecoracionBano />} />
-              <Route path="/peluches" element={<Peluches />} />
-              <Route path="/jewelry" element={<Jewelry />} />
-              <Route path="/jewelry/builder" element={<JewelryBuilder />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout/address" element={<CheckoutAddress />} />
-              <Route path="/checkout/payment" element={<CheckoutPayment />} />
-              <Route path="/order-confirmation" element={<OrderConfirmation />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/orders" element={<Orders />} />
+      <ErrorBoundaryComponent>
+        <PersonalizationProvider>
+          <div className="min-h-screen flex flex-col bg-white">
+            <Header />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/decoracion-bano" element={<DecoracionBano />} />
+                <Route path="/peluches" element={<Peluches />} />
+                <Route path="/jewelry" element={<Jewelry />} />
+                <Route path="/jewelry/builder" element={<JewelryBuilder />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout/address" element={<CheckoutAddress />} />
+                <Route path="/checkout/payment" element={<CheckoutPayment />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/orders" element={<Orders />} />
               <Route 
                 path="/admin" 
                 element={

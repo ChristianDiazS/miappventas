@@ -1,8 +1,27 @@
+import logger from '../config/logger.js';
+import { captureException } from '../config/sentry.js';
+
 export function errorHandler(err, req, res, next) {
-  const status = err.status || 500;
+  const status = err.statusCode || err.status || 500;
   const message = err.message || 'Error interno del servidor';
 
-  console.error(`[ERROR] ${status} - ${message}`);
+  // Log the error
+  logger.error(`[${status}] ${message}`, {
+    path: req.path,
+    method: req.method,
+    userId: req.user?.id,
+    stack: err.stack
+  });
+
+  // Capture error in Sentry if status code is 5xx
+  if (status >= 500) {
+    captureException(err, {
+      path: req.path,
+      method: req.method,
+      userId: req.user?.id,
+      statusCode: status
+    });
+  }
 
   res.status(status).json({
     success: false,
@@ -13,8 +32,9 @@ export function errorHandler(err, req, res, next) {
 }
 
 export class ApiError extends Error {
-  constructor(message, status = 500) {
+  constructor(message, statusCode = 500) {
     super(message);
-    this.status = status;
+    this.statusCode = statusCode;
+    this.name = 'ApiError';
   }
 }

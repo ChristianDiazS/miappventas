@@ -10,6 +10,7 @@ import logger from './config/logger.js';
 // Security Middleware
 import { globalLimiter, loginLimiter, apiLimiter, bruteForceProtection } from './middleware/rateLimiter.js';
 import { auditLog } from './middleware/auditLog.js';
+import { performanceTracking } from './middleware/sentryMiddleware.js';
 import { getCORSOptions, getSecurityHeaders } from './config/corsConfig.js';
 import { redirectToHttps } from './config/httpsConfig.js';
 
@@ -62,6 +63,10 @@ export function createApp() {
   // ============ SEGURIDAD - ETAPA 5: AUDITORÍA ============
   // Registrar todas las acciones en auditoría
   app.use(auditLog);
+
+  // ============ MONITOREO - PERFORMANCE ============
+  // Track performance and errors with Sentry
+  app.use(performanceTracking);
 
   // ============ PARSER MIDDLEWARE ============
   app.use(express.json({ limit: '50mb' }));

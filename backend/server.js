@@ -2,14 +2,24 @@ import dotenv from 'dotenv';
 import { connectDB } from './src/config/database.js';
 import { createApp } from './src/app.js';
 import { initializeBackupScheduler } from './src/services/backupService.js';
+import { initializeSentry } from './src/config/sentry.js';
 import logger from './src/config/logger.js';
 
 dotenv.config();
+
+// Initialize Sentry for error tracking (if configured)
+const sentryEnabled = initializeSentry(null, process.env.NODE_ENV);
 
 // Database
 connectDB();
 
 const app = createApp();
+
+// Re-initialize Sentry with app instance (for request handler middleware)
+if (sentryEnabled && process.env.SENTRY_DSN) {
+  const { initializeSentry: reinitSentry } = await import('./src/config/sentry.js');
+  reinitSentry(app, process.env.NODE_ENV);
+}
 
 // Initialize automatic backup scheduler (every 6 hours)
 // Schedule: "0 */6 * * *" = runs at 00:00, 06:00, 12:00, 18:00
