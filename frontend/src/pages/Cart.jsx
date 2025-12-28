@@ -12,15 +12,19 @@ export function Cart() {
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const getProductImage = (category) => {
+  const getProductImage = (product) => {
+    // Si el producto tiene imagen, usarla
+    if (product.image) {
+      return product.image;
+    }
+    
+    // Fallback por categoría si no tiene imagen
     const imageMap = {
-      'Laptops': '/images/products/laptop/product-laptop-001.jpeg',
-      'Monitores': '/images/products/monitor/product-monitor-001.jpeg',
-      'Periféricos': '/images/products/keyboard/product-keyboard-001.jpeg',
-      'Accesorios': '/images/products/headphones/product-headphones-001.jpeg',
-      'Mobiliario': '/images/products/chair/product-chair-001.jpeg'
+      'Joyería': '/images/placeholder.svg',
+      'Arreglos Florales': '/images/placeholder.svg',
+      'Decoración para el Baño': '/images/placeholder.svg'
     };
-    return imageMap[category] || '/images/products/laptop/product-laptop-001.jpeg';
+    return imageMap[product.category] || '/images/placeholder.svg';
   };
 
   useEffect(() => {
@@ -119,16 +123,74 @@ export function Cart() {
                 {cart.map((item) => (
                   <Card key={item.productId} className="p-4">
                     <div className="flex gap-4">
-                      <div className="bg-linear-to-br from-gray-100 to-gray-200 w-24 h-24 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          src={getProductImage(item.category)}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = '/images/placeholder.jpg';
-                          }}
-                        />
-                      </div>
+                      {/* Mostrar vista previa del combo si es personalizado */}
+                      {item.isCustomCombo && item.componentImages ? (
+                        <div className="w-24 h-24 rounded flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 relative">
+                          {/* Grid 2x2 para mostrar las 4 piezas */}
+                          <div className="grid grid-cols-2 gap-0.5 w-full h-full p-1">
+                            {item.componentImages.collar && (
+                              <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={item.componentImages.collar}
+                                  alt="Collar"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    e.target.src = '/images/placeholder.jpg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {item.componentImages.dije && (
+                              <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={item.componentImages.dije}
+                                  alt="Dije"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    e.target.src = '/images/placeholder.jpg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {item.componentImages.arete && (
+                              <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={item.componentImages.arete}
+                                  alt="Arete"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    e.target.src = '/images/placeholder.jpg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {item.componentImages.anillo && (
+                              <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={item.componentImages.anillo}
+                                  alt="Anillo"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    e.target.src = '/images/placeholder.jpg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        /* Mostrar imagen única para productos normales */
+                        <div className="bg-linear-to-br from-gray-100 to-gray-200 w-24 h-24 rounded flex items-center justify-center shrink-0 overflow-hidden">
+                          <img
+                            src={getProductImage(item)}
+                            alt={item.name}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              e.target.src = '/images/placeholder.jpg';
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{item.name}</h3>
                         <p className="text-cyan-600 font-bold mb-2">S/. {item.price.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>

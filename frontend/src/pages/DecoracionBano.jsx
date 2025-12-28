@@ -59,7 +59,7 @@ export function DecoracionBano() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/products?limit=100');
+      const response = await fetch('http://localhost:5000/api/products?limit=200');
       if (!response.ok) throw new Error('Error al cargar productos');
 
       const data = await response.json();

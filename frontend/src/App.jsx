@@ -20,6 +20,11 @@ import Register from './pages/Register';
 import AdminPanel from './pages/Admin/AdminPanel';
 import SuperadminPanel from './pages/SuperadminPanel';
 import { AccessDenied } from './pages/AccessDenied';
+import { DecoracionBano } from './pages/DecoracionBano';
+import { Peluches } from './pages/Peluches';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Contact from './pages/Contact';
 
 export default function App() {
   return (
@@ -32,6 +37,8 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/decoracion-bano" element={<DecoracionBano />} />
+              <Route path="/peluches" element={<Peluches />} />
               <Route path="/jewelry" element={<Jewelry />} />
               <Route path="/jewelry/builder" element={<JewelryBuilder />} />
               <Route path="/cart" element={<Cart />} />
@@ -59,6 +66,9 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/access-denied" element={<AccessDenied />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/contact" element={<Contact />} />
             </Routes>
           </main>
           <Footer />

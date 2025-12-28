@@ -113,7 +113,9 @@ export function Jewelry() {
                   >
                     {/* Imagen */}
                     <div
-                      className="bg-gray-200 h-48 w-full cursor-pointer hover:bg-gray-300 transition duration-300 relative overflow-hidden"
+                      className={`bg-gray-200 h-48 w-full cursor-pointer hover:bg-gray-300 transition duration-300 relative overflow-hidden ${
+                        category === 'Collar' ? 'border-8 border-black' : ''
+                      }`}
                       onClick={() => navigate(`/products/${product.id}`)}
                     >
                       <LazyImage

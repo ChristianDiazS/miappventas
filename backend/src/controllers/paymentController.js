@@ -24,7 +24,7 @@ function validateCardNumberLuhn(cardNumber) {
 }
 
 /**
- * Crear una sesión de pago con Stripe
+ * Crear una sesión de pago con Izipay
  * POST /api/payments/create-session
  */
 export async function createPaymentSession(req, res, next) {
@@ -57,7 +57,7 @@ export async function createPaymentSession(req, res, next) {
     // Simular sesión de pago
     const paymentSession = {
       sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      paymentUrl: `https://checkout.stripe.com/pay/${order.orderNumber}`,
+      paymentUrl: `https://checkout.izipay.pe/pay/${order.orderNumber}`,
       amount: order.total,
       orderId: order.orderNumber,
       status: 'pending'
@@ -135,7 +135,7 @@ export async function processPayment(req, res, next) {
         data: {
           orderId: order.id,
           userId: req.user.id,
-          provider: 'STRIPE',
+          provider: 'IZIPAY',
           providerId: transactionId,
           amount: order.total,
           status: 'COMPLETED'
@@ -170,7 +170,7 @@ export async function processPayment(req, res, next) {
 }
 
 /**
- * Webhook de Stripe para confirmación de pago
+ * Webhook de Izipay para confirmación de pago
  * POST /api/payments/webhook
  */
 export async function handlePaymentWebhook(req, res, next) {

@@ -35,16 +35,17 @@ export function useCart() {
 
   // Agregar producto al carrito
   const addToCart = (product) => {
-    const { _id, name, price, stock } = product;
+    const { _id, id, name, price, stock, image, category, componentImages, components, isCustomCombo } = product;
+    const productId = _id || id;
 
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.productId === _id);
+      const existingItem = prevCart.find((item) => item.productId === productId);
 
       if (existingItem) {
         // Si ya existe, aumentar cantidad
         if (existingItem.quantity < stock) {
           return prevCart.map((item) =>
-            item.productId === _id
+            item.productId === productId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           );
@@ -56,11 +57,16 @@ export function useCart() {
       return [
         ...prevCart,
         {
-          productId: _id,
+          productId,
           name,
           price,
           quantity: 1,
-          stock
+          stock,
+          image,
+          category,
+          componentImages,
+          components,
+          isCustomCombo
         }
       ];
     });

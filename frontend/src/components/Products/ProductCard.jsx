@@ -81,6 +81,7 @@ export default function ProductCard({ product, onAddToCart, selectedCategory, on
     if (product.type === 'combo' && product.comboItems) {
       if (product.comboItems.collar) {
         const comboImage = generateComponentImagesFromCombo(product, 'collar');
+        console.log('🎯 Agregando COLLAR:', { comboImage });
         onAddToPersonalization?.('collar', {
           ...productWithSize,
           componentImage: comboImage
@@ -88,6 +89,7 @@ export default function ProductCard({ product, onAddToCart, selectedCategory, on
       }
       if (product.comboItems.dije) {
         const comboImage = generateComponentImagesFromCombo(product, 'dije');
+        console.log('🎯 Agregando DIJE:', { comboImage });
         onAddToPersonalization?.('dije', {
           ...productWithSize,
           componentImage: comboImage
@@ -95,17 +97,25 @@ export default function ProductCard({ product, onAddToCart, selectedCategory, on
       }
       if (product.comboItems.arete) {
         const comboImage = generateComponentImagesFromCombo(product, 'arete');
-        onAddToPersonalization?.('arete', {
-          ...productWithSize,
-          componentImage: comboImage
-        });
+        console.log('🎯 Agregando ARETE:', { comboImage });
+        // Solo agregar si la imagen es válida (no null)
+        if (comboImage) {
+          onAddToPersonalization?.('arete', {
+            ...productWithSize,
+            componentImage: comboImage
+          });
+        }
       }
       if (product.comboItems.anillo) {
         const comboImage = generateComponentImagesFromCombo(product, 'anillo');
-        onAddToPersonalization?.('anillo', {
-          ...productWithSize,
-          componentImage: comboImage
-        });
+        console.log('🎯 Agregando ANILLO:', { comboImage });
+        // Solo agregar si la imagen es válida (no null)
+        if (comboImage) {
+          onAddToPersonalization?.('anillo', {
+            ...productWithSize,
+            componentImage: comboImage
+          });
+        }
       }
     } else {
       // Si es un producto individual, agregarlo en su categoría
@@ -121,7 +131,9 @@ export default function ProductCard({ product, onAddToCart, selectedCategory, on
       <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full">
         {/* IMAGEN CON CARRUSEL */}
         <div 
-          className="relative w-full bg-gray-100 group overflow-hidden cursor-pointer" 
+          className={`relative w-full bg-gray-100 group overflow-hidden cursor-pointer rounded-t-lg ${
+            selectedCategory === 'Collar' ? 'border border-black' : ''
+          }`}
           style={{ aspectRatio: '3/4' }}
           onClick={() => setShowDetailModal(true)}
         >
@@ -130,7 +142,9 @@ export default function ProductCard({ product, onAddToCart, selectedCategory, on
             <img
               src={images[currentImageIndex]}
               alt={product.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+                isCombo && product.comboItems?.collar && product.comboItems?.dije && product.comboItems?.arete ? 'object-contain' : 'object-cover'
+              }`}
             />
           )}
 

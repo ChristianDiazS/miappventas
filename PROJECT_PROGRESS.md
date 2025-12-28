@@ -1,7 +1,7 @@
 # 📊 ESTADO DEL PROYECTO - MiAppVentas
 
 **Última actualización:** 27 de diciembre de 2025  
-**Sesión:** Implementación de imágenes de componentes para combos de joyería
+**Sesión:** Mejora visual de combos y soporte para Collar+Dije
 
 ---
 
@@ -32,7 +32,7 @@
 - ✅ Grid de 4 recuadros (Collar, Dije, Arete, Anillo)
 - **Archivo:** `frontend/src/pages/Products.jsx`
 
-### 5. **Imágenes Diferentes por Componente de Combo**
+### 5. **Imágenes Diferentes por Componente de Combo (Collar+Dije+Arete)**
 - ✅ 24 imágenes editadas subidas a Cloudinary
 - ✅ Sistema genera URLs específicas por componente
 - ✅ Collar: imagen base (collar-focused)
@@ -42,6 +42,22 @@
   - `frontend/src/utils/cloudinaryImageGenerator.js`
   - `frontend/src/components/Products/ProductCard.jsx`
   - `frontend/src/context/PersonalizationContext.jsx`
+
+### 6. **Mejora Visual de Imágenes en Cards**
+- ✅ Cambio de `object-cover` a `object-contain` para combos Collar+Dije+Arete
+- ✅ Reduce ampliación excesiva del cartón en las imágenes
+- ✅ Solo aplica a combos completos de 3 piezas
+- ✅ Otros productos mantienen comportamiento original
+- **Archivo:** `frontend/src/components/Products/ProductCard.jsx`
+
+### 7. **Soporte para Combos Collar+Dije (sin Arete)**
+- ✅ 20 imágenes base subidas a Cloudinary (carpeta `miappventas/collar-dije/`)
+- ✅ 20 imágenes enfocadas en Dije subidas (img-collardije#-dije.jpg)
+- ✅ Sistema detecta automáticamente el tipo de combo
+- ✅ Genera URLs correctas según carpeta correspondiente
+- ✅ Retorna `null` para arete/anillo cuando no aplica
+- **Carpeta Cloudinary:** `miappventas/collar-dije/`
+- **Total imágenes subidas:** 40 (20 base + 20 -dije)
 
 ---
 
@@ -76,92 +92,73 @@ Carpeta principal: miappventas/collar-dije-arete/
 
 ## 📁 ESTRUCTURA DE IMÁGENES EN CLOUDINARY
 
-### Imágenes Base (Collar - existentes)
+### Combo Tipo 1: Collar + Dije + Arete (12 combos)
+**Carpeta:** `miappventas/collar-dije-arete/`
 ```
-✅ img-collardijearete1.jpeg
-✅ img-collardijearete2.jpeg
-✅ img-collardijearete3.jpeg
-✅ img-collardijearete4.jpeg
-✅ img-collardijearete5.jpeg
-✅ img-collardijearete6.jpeg
-✅ img-collardijearete7.jpeg
-✅ img-collardijearete8.jpeg
-✅ img-collardijearete9.jpeg
-✅ img-collardijearete10.jpeg
-✅ img-collardijearete11.jpeg
-✅ img-collardijearete12.jpeg
+Base (Collar):
+✅ img-collardijearete1.jpeg a img-collardijearete12.jpeg
+
+Enfocadas en Dije:
+✅ img-collardijearete1-dije.jpeg a img-collardijearete12-dije.jpeg
+
+Enfocadas en Arete:
+✅ img-collardijearete1-arete.jpeg a img-collardijearete12-arete.jpeg
 ```
 
-### Imágenes Enfocadas en Dije (RECIENTEMENTE SUBIDAS ✨)
+### Combo Tipo 2: Collar + Dije (20 combos) - NUEVO
+**Carpeta:** `miappventas/collar-dije/`
 ```
-✅ img-collardijearete1-dije.jpeg
-✅ img-collardijearete2-dije.jpeg
-✅ img-collardijearete3-dije.jpeg
-✅ img-collardijearete4-dije.jpeg
-✅ img-collardijearete5-dije.jpeg
-✅ img-collardijearete6-dije.jpeg
-✅ img-collardijearete7-dije.jpeg
-✅ img-collardijearete8-dije.jpeg
-✅ img-collardijearete9-dije.jpeg
-✅ img-collardijearete10-dije.jpeg
-✅ img-collardijearete11-dije.jpeg
-✅ img-collardijearete12-dije.jpeg
-```
+Base (Collar):
+✅ img-collardije1.jpg a img-collardije20.jpg
 
-### Imágenes Enfocadas en Arete (RECIENTEMENTE SUBIDAS ✨)
-```
-✅ img-collardijearete1-arete.jpeg
-✅ img-collardijearete2-arete.jpeg
-✅ img-collardijearete3-arete.jpeg
-✅ img-collardijearete4-arete.jpeg
-✅ img-collardijearete5-arete.jpeg
-✅ img-collardijearete6-arete.jpeg
-✅ img-collardijearete7-arete.jpeg
-✅ img-collardijearete8-arete.jpeg
-✅ img-collardijearete9-arete.jpeg
-✅ img-collardijearete10-arete.jpeg
-✅ img-collardijearete11-arete.jpeg
-✅ img-collardijearete12-arete.jpeg
+Enfocadas en Dije:
+✅ img-collardije1-dije.jpg a img-collardije20-dije.jpg
 ```
 
 ---
 
 ## 💻 CÓDIGO CLAVE - FUNCIONES ACTUALES
 
-### 1. cloudinaryImageGenerator.js
+### 1. cloudinaryImageGenerator.js (ACTUALIZADO)
 **Ubicación:** `frontend/src/utils/cloudinaryImageGenerator.js`
 
-**Función Principal:**
+**Detección automática de tipo de combo:**
 ```javascript
-export function generateComponentImagesFromCombo(product, componentType) {
-  // Extrae nombre base: "img-collardijearete9"
-  // Genera URLs específicas:
-  // - collar: .../img-collardijearete9.jpeg
-  // - dije: .../img-collardijearete9-dije.jpeg
-  // - arete: .../img-collardijearete9-arete.jpeg (con transformaciones especiales)
+const isCollarDijeArete = fileName.includes('collardijearete');
+const isCollarDije = fileName.includes('collardije') && !isCollarDijeArete;
+
+// Determina la carpeta según el tipo
+let cloudinaryFolder = 'miappventas/collar-dije-arete/';
+if (isCollarDije) {
+  cloudinaryFolder = 'miappventas/collar-dije/';
 }
 ```
 
-**Transformación especial para Arete:**
-```javascript
-transformations = 'x_75,y_-100,w_400,h_400,c_crop,f_auto,q_auto';
-// Resultado: Centra un arete individual en el recuadro 400x400
-```
+**Comportamiento según tipo de combo:**
+- **Collar+Dije+Arete:** Devuelve imágenes para collar, dije, arete
+- **Collar+Dije:** Devuelve imágenes para collar y dije; retorna `null` para arete/anillo
 
-### 2. ProductCard.jsx
+### 2. ProductCard.jsx (ACTUALIZADO)
 **Ubicación:** `frontend/src/components/Products/ProductCard.jsx`
 
-**En handleAddToPersonalization():**
+**Cambios realizados:**
+1. Imagen con condición de `object-contain` solo para combos Collar+Dije+Arete:
+```jsx
+className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+  isCombo && product.comboItems?.collar && product.comboItems?.dije && product.comboItems?.arete 
+    ? 'object-contain' 
+    : 'object-cover'
+}`}
+```
+
+2. Validación de imágenes antes de agregar arete/anillo:
 ```javascript
-if (product.type === 'combo' && product.comboItems) {
-  // Para cada componente (collar, dije, arete):
-  const componentImage = generateComponentImagesFromCombo(product, componentType);
-  // Llama addToPersonalization con la imagen enfocada
-  addToPersonalization({
-    ...product,
-    category: componentType,
-    componentImage: componentImage
-  });
+if (product.comboItems.arete) {
+  const comboImage = generateComponentImagesFromCombo(product, 'arete');
+  // Solo agregar si la imagen es válida (no null)
+  if (comboImage) {
+    onAddToPersonalization?.('arete', { ... });
+  }
 }
 ```
 
@@ -201,28 +198,50 @@ if (product.componentImage) {
 
 ---
 
-## 🎯 FLUJO DE DATOS ACTUAL
+## 🎯 FLUJOS DE DATOS
 
+### Flujo 1: Combo Collar+Dije+Arete (3 piezas)
 ```
-1. Usuario selecciona categoría "Collar" en dropdown
-   ↓
-2. Ve productos de Collar y selecciona un combo
-   ↓
-3. Hace clic en "Agregar a Personalizado"
-   ↓
-4. ProductCard.js detecta que es combo: product.type === 'combo'
-   ↓
-5. Para cada componente (collar, dije, arete):
-   - Llama generateComponentImagesFromCombo(product, 'collar')
-   - Obtiene URL: .../img-collardijearete9.jpeg
-   - Llama addToPersonalization({...product, componentImage: URL})
-   ↓
-6. PersonalizationContext guarda la imagen en componentImages.collar
-   ↓
-7. Products.jsx renderiza:
-   - Recuadro Collar: componentImages.collar (imagen enfocada en collar)
-   - Recuadro Dije: componentImages.dije (imagen enfocada en dije)
-   - Recuadro Arete: componentImages.arete (imagen enfocada en arete con zoom especial)
+Usuario selecciona Collar → Ve 12 combos
+↓
+Selecciona combo Collar+Dije+Arete (ej: img-collardijearete9)
+↓
+Click en "Agregar a Personalizado"
+↓
+GenerateComponentImagesFromCombo() detecta "collardijearete"
+↓
+Genera URLs desde carpeta: miappventas/collar-dije-arete/
+- Collar: img-collardijearete9.jpeg
+- Dije: img-collardijearete9-dije.jpeg
+- Arete: img-collardijearete9-arete.jpeg (con crop especial)
+↓
+Tu Juego Personalizado muestra 3 recuadros rellenos:
+- 📿 Collar: imagen enfocada en collar
+- ✨ Dije: imagen enfocada en dije
+- 👂 Arete: imagen enfocada en arete
+```
+
+### Flujo 2: Combo Collar+Dije (2 piezas) - NUEVO
+```
+Usuario selecciona Collar → Ve 20 combos
+↓
+Selecciona combo Collar+Dije (ej: img-collardije5)
+↓
+Click en "Agregar a Personalizado"
+↓
+GenerateComponentImagesFromCombo() detecta "collardije"
+↓
+Genera URLs desde carpeta: miappventas/collar-dije/
+- Collar: img-collardije5.jpg
+- Dije: img-collardije5-dije.jpg
+- Arete: null (no aplica)
+- Anillo: null (no aplica)
+↓
+Tu Juego Personalizado muestra 2 recuadros rellenos:
+- 📿 Collar: imagen enfocada en collar
+- ✨ Dije: imagen enfocada en dije
+- 👂 Arete: vacío (+)
+- 💍 Anillo: vacío (+)
 ```
 
 ---
@@ -250,20 +269,20 @@ if (product.componentImage) {
 
 ---
 
-## 🚀 PRÓXIMOS PASOS (Cuando continúes)
+## 🚀 PRÓXIMOS PASOS
 
 ### Opciones de Mejora:
-1. **Anillo:** Si hay combos con anillo, posiblemente necesite transformación similar a arete
-2. **Optimización de transformaciones:** Evaluar si algunos valores pueden unificarse
-3. **Pruebas en diferentes combos:** Verificar que la transformación funcione bien en todos los 12 combos
-4. **Responsive design:** Revisar cómo se ve en móvil (sm, md, lg breakpoints)
+1. **Anillo:** Implementar soporte para combos que incluyan anillo (con transformaciones similares)
+2. **Más combos:** Agregar tipos adicionales según sea necesario
+3. **Responsive design:** Revisar cómo se ve en móvil (sm, md, lg breakpoints)
+4. **Optimización de imágenes:** Evaluar compresión adicional sin perder calidad
 5. **UX adicional:** Considerar agregar más funcionalidades o refinamientos
 
-### Si encontras problemas:
-- Verifica el archivo `uploadToCloudinary.js` en la raíz (script de carga)
-- Consulta `cloudinaryImageGenerator.js` para entender la lógica de URL
-- Revisa `PersonalizationContext.jsx` para state management
-- Chequea `Products.jsx` para el renderizado de imágenes
+### Verificar en navegador:
+- ✅ Sección Collar: Ver 12 combos Collar+Dije+Arete y 20 combos Collar+Dije
+- ✅ Cards: Sin ampliación excesiva (object-contain para C+D+A)
+- ✅ Al agregar combo C+D+A: Muestra 3 recuadros rellenos
+- ✅ Al agregar combo C+D: Muestra 2 recuadros rellenos, 2 vacíos
 
 ---
 
@@ -305,14 +324,35 @@ if (product.componentImage) {
 
 ## 🔐 Sesión Completada
 
-**Logros de hoy:**
-- ✅ Subida exitosa de 24 imágenes a Cloudinary
-- ✅ Implementación de transformaciones especiales para arete
-- ✅ Sistema completo de imágenes por componente funcionando
-- ✅ Documentación detallada para continuidad
+**Logros de esta sesión:**
+- ✅ Mejora visual: `object-contain` para combos Collar+Dije+Arete
+- ✅ Soporte para combos Collar+Dije (2 piezas)
+- ✅ Subida de 40 imágenes a Cloudinary (carpeta `miappventas/collar-dije/`)
+- ✅ Sistema automático de detección de tipo de combo
+- ✅ Validación de componentes antes de agregar
+- ✅ Documentación actualizada
 
-**Status Final:** 🎉 LISTO PARA PRODUCCIÓN EN JOYERÍA
+**Status Final:** 🎉 LISTO PARA PRUEBAS EN NAVEGADOR
 
 ---
 
-*Para continuar mañana: Lee desde "PRÓXIMOS PASOS" y verifica que todo siga funcionando correctamente. Si hay cambios, actualiza este documento.*
+## 📝 NOTAS IMPORTANTES
+
+1. **Tipos de combos soportados:**
+   - Collar+Dije+Arete (12 combos): Carpeta `collar-dije-arete/`
+   - Collar+Dije (20 combos): Carpeta `collar-dije/`
+
+2. **Detección automática:**
+   - La función `generateComponentImagesFromCombo()` detecta automáticamente el tipo
+   - Usa el nombre del archivo para determinar la carpeta
+   - Retorna `null` para componentes que no aplican
+
+3. **Object-contain:**
+   - Solo aplica a combos Collar+Dije+Arete (3 piezas)
+   - Reduce ampliación y muestra imagen completa
+   - Otros productos mantienen `object-cover`
+
+4. **Imágenes en Cloudinary:**
+   - Total de imágenes: 64 (24 C+D+A + 40 C+D)
+   - Todas con transformaciones automáticas Cloudinary
+   - Calidad: auto (Cloudinary optimiza según navegador)

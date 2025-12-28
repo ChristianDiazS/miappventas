@@ -87,8 +87,8 @@ export function getSecurityHeaders() {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.stripe.com",
-      "frame-src 'self' https://js.stripe.com",
+      "connect-src 'self' https://api.izipay.pe",
+      "frame-src 'self' https://checkout.izipay.pe",
       "object-src 'none'"
     ].join('; '),
     

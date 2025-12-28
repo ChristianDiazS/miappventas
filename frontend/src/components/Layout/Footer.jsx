@@ -19,11 +19,11 @@ export function Footer() {
 
           {/* Sección 2 */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Información</h3>
+            <h3 className="text-lg font-bold mb-4">Información Legal</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white">Sobre Nosotros</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Términos & Condiciones</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Privacidad</a></li>
+              <li><Link to="/terms" className="text-gray-400 hover:text-white">Términos y Condiciones</Link></li>
+              <li><Link to="/privacy" className="text-gray-400 hover:text-white">Política de Privacidad</Link></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-white">Contacto</Link></li>
             </ul>
           </div>
 
@@ -39,7 +39,7 @@ export function Footer() {
 
         <div className="border-t border-gray-700 pt-8">
           <p className="text-center text-gray-400">
-            © 2025 Un Poquito Variado. Todos los derechos reservados.
+            © {new Date().getFullYear()} Un Poquito Variado. Todos los derechos reservados.
           </p>
         </div>
       </div>

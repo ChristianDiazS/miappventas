@@ -558,8 +558,12 @@ export function Products() {
                         </div>
                       )}
                       
-                      {/* Otras categorías (no Joyería) */}
-                      {allCategories.filter(cat => cat !== 'Joyería' && !['Anillo', 'Collar', 'Dije', 'Arete'].includes(cat)).map((category) => (
+                      {/* Otras categorías (no Joyería y solo las implementadas) */}
+                      {allCategories.filter(cat => 
+                        cat !== 'Joyería' && 
+                        !['Anillo', 'Collar', 'Dije', 'Arete'].includes(cat) &&
+                        !['Accesorios', 'Arreglos Florales', 'Electrónica', 'Monitores'].includes(cat)
+                      ).map((category) => (
                         <button
                           key={category}
                           onClick={() => {
@@ -723,7 +727,7 @@ export function Products() {
                         <LazyImage
                           src={componentImages.collar || getProductImage(selectedItems.collar)}
                           alt={selectedItems.collar.title}
-                          className="w-full h-full object-cover p-1"
+                          className="w-full h-full object-contain p-1"
                         />
                       ) : (
                         <span className="text-white/60 text-3xl">+</span>
@@ -750,7 +754,7 @@ export function Products() {
                         <LazyImage
                           src={componentImages.dije || getProductImage(selectedItems.dije)}
                           alt={selectedItems.dije.title}
-                          className="w-full h-full object-cover p-1"
+                          className="w-full h-full object-contain p-1"
                         />
                       ) : (
                         <span className="text-white/60 text-3xl">+</span>
@@ -777,7 +781,7 @@ export function Products() {
                         <LazyImage
                           src={componentImages.arete || getProductImage(selectedItems.arete)}
                           alt={selectedItems.arete.title}
-                          className="w-full h-full object-cover p-1"
+                          className="w-full h-full object-contain p-1"
                         />
                       ) : (
                         <span className="text-white/60 text-3xl">+</span>
@@ -804,7 +808,7 @@ export function Products() {
                         <LazyImage
                           src={componentImages.anillo || getProductImage(selectedItems.anillo)}
                           alt={selectedItems.anillo.title}
-                          className="w-full h-full object-cover p-1"
+                          className="w-full h-full object-contain p-1"
                         />
                       ) : (
                         <span className="text-white/60 text-3xl">+</span>
@@ -926,53 +930,95 @@ export function Products() {
                   ))}
                 </div>
 
-                {/* Paginación */}
+                {/* Paginación moderna */}
                 {getTotalPages() > 1 && (
-                  <div className="mt-12 flex justify-center items-center gap-2">
-                    {/* Botón anterior */}
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 rounded-lg border border-cyan-500 text-cyan-600 hover:bg-cyan-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                      ← Anterior
-                    </button>
-
-                    {/* Números de página */}
-                    <div className="flex gap-1">
-                      {[...Array(getTotalPages())].map((_, idx) => {
-                        const pageNum = idx + 1;
-                        return (
+                  <div className="mt-12 flex flex-col items-center gap-6">
+                    {/* Controles de paginación */}
+                    <div className="flex justify-center items-center gap-3">
+                      {/* Botón primera página */}
+                      {currentPage > 3 && (
+                        <>
                           <button
-                            key={pageNum}
-                            onClick={() => handlePageChange(pageNum)}
-                            className={`w-10 h-10 rounded-lg font-bold transition ${
-                              currentPage === pageNum
-                                ? 'bg-cyan-500 text-white'
-                                : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
-                            }`}
+                            onClick={() => handlePageChange(1)}
+                            className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cyan-50 hover:border-cyan-500 transition text-sm font-medium"
                           >
-                            {pageNum}
+                            ⟨⟨
                           </button>
-                        );
-                      })}
+                          {currentPage > 4 && <span className="text-gray-400">•••</span>}
+                        </>
+                      )}
+
+                      {/* Botón anterior */}
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cyan-50 hover:border-cyan-500 disabled:opacity-30 disabled:cursor-not-allowed transition text-sm font-medium"
+                      >
+                        ⟨
+                      </button>
+
+                      {/* Números de página (máximo 7) */}
+                      <div className="flex gap-2">
+                        {[...Array(getTotalPages())].map((_, idx) => {
+                          const pageNum = idx + 1;
+                          const maxDisplay = 7;
+                          const halfRange = Math.floor(maxDisplay / 2);
+                          
+                          let startPage = Math.max(1, currentPage - halfRange);
+                          let endPage = Math.min(getTotalPages(), startPage + maxDisplay - 1);
+                          
+                          if (endPage - startPage + 1 < maxDisplay) {
+                            startPage = Math.max(1, endPage - maxDisplay + 1);
+                          }
+
+                          if (pageNum >= startPage && pageNum <= endPage) {
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`w-9 h-9 rounded-lg font-bold transition ${
+                                  currentPage === pageNum
+                                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg scale-105'
+                                    : 'border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-cyan-400'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+
+                      {/* Botón siguiente */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === getTotalPages()}
+                        className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cyan-50 hover:border-cyan-500 disabled:opacity-30 disabled:cursor-not-allowed transition text-sm font-medium"
+                      >
+                        ⟩
+                      </button>
+
+                      {/* Botón última página */}
+                      {currentPage < getTotalPages() - 2 && (
+                        <>
+                          {currentPage < getTotalPages() - 3 && <span className="text-gray-400">•••</span>}
+                          <button
+                            onClick={() => handlePageChange(getTotalPages())}
+                            className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-cyan-50 hover:border-cyan-500 transition text-sm font-medium"
+                          >
+                            ⟩⟩
+                          </button>
+                        </>
+                      )}
                     </div>
 
-                    {/* Botón siguiente */}
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === getTotalPages()}
-                      className="px-4 py-2 rounded-lg border border-cyan-500 text-cyan-600 hover:bg-cyan-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                      Siguiente →
-                    </button>
-                  </div>
-                )}
-
-                {/* Información de página */}
-                {getTotalPages() > 1 && (
-                  <div className="mt-4 text-center text-gray-600 text-sm">
-                    Página {currentPage} de {getTotalPages()} ({filteredProducts.length} productos encontrados)
+                    {/* Información de página */}
+                    <div className="text-center text-gray-600 text-sm">
+                      <span className="font-semibold text-gray-800">Página {currentPage}</span> de <span className="font-semibold text-gray-800">{getTotalPages()}</span> 
+                      <span className="mx-1">•</span>
+                      <span className="text-gray-500">{filteredProducts.length} productos encontrados</span>
+                    </div>
                   </div>
                 )}
               </>

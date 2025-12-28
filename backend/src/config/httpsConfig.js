@@ -97,8 +97,8 @@ export function getProductionSecurityConfig() {
         scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'", 'https://api.stripe.com'],
-        frameSrc: ["'self'", 'https://js.stripe.com'],
+        connectSrc: ["'self'", 'https://api.izipay.pe'],
+        frameSrc: ["'self'", 'https://checkout.izipay.pe'],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: []
       }

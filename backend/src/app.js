@@ -22,6 +22,7 @@ import webhookRoutes from './routes/webhooks.js';
 import categoryRoutes from './routes/categories.js';
 import superadminRoutes from './routes/superadmin.js';
 import debugRoutes from './routes/debug.js';
+import contactRoutes from './routes/contact.js';
 
 export function createApp() {
   const app = express();
@@ -62,18 +63,20 @@ export function createApp() {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-  // Swagger Documentation
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      displayOperationId: true,
-      filter: true,
-      showRequestHeaders: true,
-      docExpansion: 'list'
-    },
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'MiAppVentas API Documentation'
-  }));
+  // Swagger Documentation - Solo en desarrollo
+  if (process.env.NODE_ENV !== 'production') {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayOperationId: true,
+        filter: true,
+        showRequestHeaders: true,
+        docExpansion: 'list'
+      },
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'MiAppVentas API Documentation'
+    }));
+  }
 
   // Routes
   app.use('/api/products', productRoutes);
@@ -84,7 +87,12 @@ export function createApp() {
   app.use('/api/webhooks', webhookRoutes);
   app.use('/api/categories', categoryRoutes);
   app.use('/api/superadmin', superadminRoutes);
-  app.use('/api/debug', debugRoutes);
+  app.use('/api/contact', contactRoutes);
+  
+  // Debug routes - Solo en desarrollo
+  if (process.env.NODE_ENV !== 'production') {
+    app.use('/api/debug', debugRoutes);
+  }
 
   // Health check
   app.get('/api/health', (req, res) => {

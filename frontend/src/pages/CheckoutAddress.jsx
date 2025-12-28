@@ -104,7 +104,11 @@ export function CheckoutAddress() {
           productId: item.productId,
           name: item.name,
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
+          image: item.image,
+          componentImages: item.componentImages,
+          components: item.components,
+          isCustomCombo: item.isCustomCombo
         })),
         subtotal,
         tax,

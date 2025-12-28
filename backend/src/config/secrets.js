@@ -58,9 +58,9 @@ export const secrets = {
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   corsCredentials: process.env.CORS_CREDENTIALS === 'true',
   
-  // Stripe
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  // Izipay - Procesamiento de Pagos
+  izipayApiKey: process.env.IZIPAY_API_KEY,
+  izipayMerchantId: process.env.IZIPAY_MERCHANT_ID,
   
   // Email
   emailProvider: process.env.EMAIL_PROVIDER || 'smtp',

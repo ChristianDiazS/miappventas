@@ -27,10 +27,13 @@ export function PersonalizationProvider({ children }) {
 
     // Si hay una imagen específica para este componente, guardarla
     if (product.componentImage) {
+      console.log(`💾 Guardando componentImage para ${category}:`, product.componentImage);
       setComponentImages(prev => ({
         ...prev,
         [category.toLowerCase()]: product.componentImage
       }));
+    } else {
+      console.log(`⚠️ No hay componentImage para ${category}`);
     }
   };
 

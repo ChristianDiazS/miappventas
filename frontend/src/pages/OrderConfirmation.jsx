@@ -111,11 +111,89 @@ export default function OrderConfirmation() {
           {/* Items */}
           <div className="mb-6 pb-6 border-b">
             <h3 className="font-semibold text-gray-900 mb-3">Artículos Comprados</h3>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="space-y-4 max-h-96 overflow-y-auto">
               {orderData.items && orderData.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between text-gray-700">
-                  <span>{item.name} x{item.quantity}</span>
-                  <span className="font-semibold">S/. {(item.price * item.quantity).toLocaleString('es-PE', { maximumFractionDigits: 2 })}</span>
+                <div key={idx} className="flex gap-4 pb-4 border-b last:border-b-0">
+                  {/* Mostrar vista previa del combo si es personalizado */}
+                  {item.isCustomCombo && item.componentImages ? (
+                    <div className="w-20 h-20 rounded flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 relative">
+                      {/* Grid 2x2 para mostrar las 4 piezas */}
+                      <div className="grid grid-cols-2 gap-0.5 w-full h-full p-1">
+                        {item.componentImages.collar && (
+                          <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                            <img
+                              src={item.componentImages.collar}
+                              alt="Collar"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                              }}
+                            />
+                          </div>
+                        )}
+                        {item.componentImages.dije && (
+                          <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                            <img
+                              src={item.componentImages.dije}
+                              alt="Dije"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                              }}
+                            />
+                          </div>
+                        )}
+                        {item.componentImages.arete && (
+                          <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                            <img
+                              src={item.componentImages.arete}
+                              alt="Arete"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                              }}
+                            />
+                          </div>
+                        )}
+                        {item.componentImages.anillo && (
+                          <div className="bg-white rounded flex items-center justify-center overflow-hidden">
+                            <img
+                              src={item.componentImages.anillo}
+                              alt="Anillo"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Mostrar imagen única para productos normales */
+                    <div className="bg-gray-100 w-20 h-20 rounded flex items-center justify-center shrink-0 overflow-hidden">
+                      <img
+                        src={item.image || '/images/placeholder.jpg'}
+                        alt={item.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.src = '/images/placeholder.jpg';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">{item.name}</p>
+                        <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900">S/. {(item.price * item.quantity).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-xs text-gray-500">S/. {item.price.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} c/u</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

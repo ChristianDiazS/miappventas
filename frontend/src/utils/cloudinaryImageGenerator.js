@@ -39,6 +39,7 @@ export function generateComponentImagesFromCombo(product, componentType) {
   console.log('🔍 generateComponentImagesFromCombo llamado:', {
     productTitle: product.title,
     componentType,
+    productImage: product.image,
     imageSummary: product.image?.substring(0, 80) + '...'
   });
 
@@ -48,7 +49,7 @@ export function generateComponentImagesFromCombo(product, componentType) {
   }
 
   try {
-    // Extraer el nombre base de la imagen (ej: "img-collardijearete9")
+    // Extraer el nombre base de la imagen (ej: "img-collardijearete9" o "img-collardije1")
     const uploadIndex = product.image.indexOf('/upload/');
     if (uploadIndex === -1) {
       console.warn('No es una URL de Cloudinary válida');
@@ -68,33 +69,59 @@ export function generateComponentImagesFromCombo(product, componentType) {
     
     // Obtener solo el nombre del archivo (última parte)
     const fileNameWithPath = fullPath.split('/');
-    const fileName = fileNameWithPath[fileNameWithPath.length - 1]; // Ej: "img-collardijearete9"
+    const fileName = fileNameWithPath[fileNameWithPath.length - 1]; // Ej: "img-collardijearete9" o "img-collardije1"
     
     console.log(`📌 Nombre base extraído: ${fileName}`);
+    console.log(`📌 Full path: ${fullPath}`);
+
+    // Detectar si es combo Collar+Dije+Arete o Collar+Dije
+    const isCollarDijeArete = fileName.includes('collardijearete');
+    const isCollarDije = fileName.includes('collardije') && !isCollarDijeArete;
+
+    console.log(`🔎 isCollarDijeArete: ${isCollarDijeArete}, isCollarDije: ${isCollarDije}`);
+
+    // Determinar la carpeta de Cloudinary según el tipo de combo
+    let cloudinaryFolder = 'miappventas/collar-dije-arete/';
+    if (isCollarDije) {
+      cloudinaryFolder = 'miappventas/collar-dije/';
+    }
+
+    console.log(`📁 Carpeta Cloudinary: ${cloudinaryFolder}`);
 
     // Generar URL según el componente
-    // Para collar: usa la imagen base (ya enfocada en collar)
-    // Para dije: usa img-collardijearete9-dije
-    // Para arete: usa img-collardijearete9-arete
     let componentFileName = fileName;
     let transformations = baseTransformations;
     
-    if (componentType === 'dije') {
-      componentFileName = `${fileName}-dije`;
-    } else if (componentType === 'arete') {
-      componentFileName = `${fileName}-arete`;
-      // Recorte desplazado hacia arriba y hacia la derecha - centrado
-      transformations = 'x_75,y_-100,w_400,h_400,c_crop,f_auto,q_auto';
+    if (isCollarDijeArete) {
+      // Lógica para Collar + Dije + Arete
+      if (componentType === 'dije') {
+        componentFileName = `${fileName}-dije`;
+      } else if (componentType === 'arete') {
+        componentFileName = `${fileName}-arete`;
+        // Recorte desplazado hacia arriba y hacia la derecha - centrado
+        transformations = 'x_75,y_-100,w_400,h_400,c_crop,f_auto,q_auto';
+      }
+      // Para 'collar' y 'anillo', usamos el nombre base sin sufijo
+    } else if (isCollarDije) {
+      // Lógica para Collar + Dije
+      if (componentType === 'dije') {
+        componentFileName = `${fileName}-dije`;
+      }
+      // Para 'collar', usamos el nombre base sin sufijo
+      // Para 'arete' y 'anillo', retornamos null (no aplican)
+      if (componentType === 'arete' || componentType === 'anillo') {
+        console.log(`⚠️ ${componentType} no aplica para Collar+Dije, retornando null`);
+        return null;
+      }
     }
-    // Para 'collar' y 'anillo', usamos el nombre base sin sufijo
 
     // Reconstruir la ruta completa
-    const componentPath = `miappventas/collar-dije-arete/${componentFileName}`;
+    const componentPath = `${cloudinaryFolder}${componentFileName}`;
     
-    // Generar URL de Cloudinary
-    const transformedUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${componentPath}.jpeg`;
+    // Generar URL de Cloudinary (sin extensión, Cloudinary optimiza automáticamente)
+    const transformedUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${componentPath}`;
     
-    console.log(`✅ URL para ${componentType}:`, transformedUrl);
+    console.log(`✅ URL FINAL para ${componentType}:`, transformedUrl);
     return transformedUrl;
     
   } catch (e) {

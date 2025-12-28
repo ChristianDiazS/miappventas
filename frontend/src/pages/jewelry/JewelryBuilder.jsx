@@ -7,11 +7,12 @@ import { Toast } from '../../components/Common/Toast';
 import { LazyImage } from '../../components/Common/LazyImage';
 import { useCart } from '../../hooks/useCart';
 import { usePersonalization } from '../../context/PersonalizationContext';
+import { generateComponentImagesFromCombo } from '../../utils/cloudinaryImageGenerator';
 
 export function JewelryBuilder() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { selectedItems, getTotalPrice, getBasePrice, clearPersonalization, totalDiscount } = usePersonalization();
+  const { selectedItems, getTotalPrice, getBasePrice, clearPersonalization, totalDiscount, componentImages } = usePersonalization();
   
   // Array con todas las imágenes de anillos disponibles
   const anilloImages = [
@@ -86,6 +87,25 @@ export function JewelryBuilder() {
     return getBasePrice();
   };
 
+  // Función para generar imagen de componente - Reutilizable
+  const getComponentImage = (item, componentType) => {
+    if (!item) return null;
+    
+    // Si el item es un combo, usar generateComponentImagesFromCombo
+    if (item.type === 'combo' && item.comboItems) {
+      const generatedImage = generateComponentImagesFromCombo(item, componentType);
+      console.log(`🎨 Generada imagen para ${componentType}:`, generatedImage);
+      return generatedImage;
+    }
+    // Si no es combo, usar la imagen del producto y componentImage si existe
+    if (componentImages[componentType]) {
+      console.log(`✨ Usando componentImage guardada para ${componentType}:`, componentImages[componentType]);
+      return componentImages[componentType];
+    }
+    // Fallback a la imagen del producto
+    return item.image;
+  };
+
   const handleAddToCart = () => {
     if (!selectedItems.collar || !selectedItems.dije || !selectedItems.anillo || !selectedItems.arete) {
       setToast({
@@ -107,21 +127,35 @@ export function JewelryBuilder() {
 
     // Crear producto de juego personalizado
     const gameProduct = {
-      id: `game-${Date.now()}`,
+      _id: `game-${Date.now()}`,
+      name: 'Juego Personalizado de Accesorios',
       title: 'Juego Personalizado de Accesorios',
       description: `Collar: ${selectedItems.collar.title} | Dije: ${selectedItems.dije.title} | Anillo: ${selectedItems.anillo.title} | Arete: ${selectedItems.arete.title}`,
       price: calculateGamePrice(),
-      category: 'Personaliza tu juego de accesorios',
+      category: 'Joyería',
       stock: 1,
       image: selectedItems.collar.image,
+      // Guardar las imágenes de componentes generadas correctamente
+      componentImages: {
+        collar: getComponentImage(selectedItems.collar, 'collar'),
+        dije: getComponentImage(selectedItems.dije, 'dije'),
+        arete: getComponentImage(selectedItems.arete, 'arete'),
+        anillo: getComponentImage(selectedItems.anillo, 'anillo')
+      },
       // Guardar referencias a los productos individuales
       components: {
-        collarId: selectedItems.collar.id,
-        dijeId: selectedItems.dije.id,
-        anilloId: selectedItems.anillo.id,
-        areteId: selectedItems.arete.id
-      }
+        collarId: selectedItems.collar.id || selectedItems.collar._id,
+        dijeId: selectedItems.dije.id || selectedItems.dije._id,
+        anilloId: selectedItems.anillo.id || selectedItems.anillo._id,
+        areteId: selectedItems.arete.id || selectedItems.arete._id
+      },
+      isCustomCombo: true
     };
+
+    console.log('🛒 Producto agregado al carrito:', {
+      title: gameProduct.title,
+      componentImages: gameProduct.componentImages
+    });
 
     addToCart(gameProduct);
     setToast({
@@ -160,18 +194,15 @@ export function JewelryBuilder() {
                 <div className="w-16 sm:w-20 h-16 sm:h-20 bg-white/30 rounded-lg overflow-hidden flex items-center justify-center mb-2">
                   {selectedItems.collar ? (
                     <LazyImage
-                      src={selectedItems.collar.image || 'https://via.placeholder.com/64'}
+                      src={getComponentImage(selectedItems.collar, 'collar') || 'https://via.placeholder.com/64'}
                       alt={selectedItems.collar.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-3xl text-white/60">+</span>
                   )}
                 </div>
                 <p className="text-xs sm:text-sm font-bold text-white">📿 Collar</p>
-                {selectedItems.collar && (
-                  <p className="text-xs text-white/90 mt-1 line-clamp-1 text-center">{selectedItems.collar.title}</p>
-                )}
               </div>
 
               {/* Dije */}
@@ -179,18 +210,15 @@ export function JewelryBuilder() {
                 <div className="w-16 sm:w-20 h-16 sm:h-20 bg-white/30 rounded-lg overflow-hidden flex items-center justify-center mb-2">
                   {selectedItems.dije ? (
                     <LazyImage
-                      src={selectedItems.dije.image || 'https://via.placeholder.com/64'}
+                      src={getComponentImage(selectedItems.dije, 'dije') || 'https://via.placeholder.com/64'}
                       alt={selectedItems.dije.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-3xl text-white/60">+</span>
                   )}
                 </div>
                 <p className="text-xs sm:text-sm font-bold text-white">✨ Dije</p>
-                {selectedItems.dije && (
-                  <p className="text-xs text-white/90 mt-1 line-clamp-1 text-center">{selectedItems.dije.title}</p>
-                )}
               </div>
 
               {/* Arete */}
@@ -198,18 +226,15 @@ export function JewelryBuilder() {
                 <div className="w-16 sm:w-20 h-16 sm:h-20 bg-white/30 rounded-lg overflow-hidden flex items-center justify-center mb-2">
                   {selectedItems.arete ? (
                     <LazyImage
-                      src={selectedItems.arete.image || 'https://via.placeholder.com/64'}
+                      src={getComponentImage(selectedItems.arete, 'arete') || 'https://via.placeholder.com/64'}
                       alt={selectedItems.arete.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-3xl text-white/60">+</span>
                   )}
                 </div>
                 <p className="text-xs sm:text-sm font-bold text-white">👂 Arete</p>
-                {selectedItems.arete && (
-                  <p className="text-xs text-white/90 mt-1 line-clamp-1 text-center">{selectedItems.arete.title}</p>
-                )}
               </div>
 
               {/* Anillo */}
@@ -217,18 +242,15 @@ export function JewelryBuilder() {
                 <div className="w-16 sm:w-20 h-16 sm:h-20 bg-white/30 rounded-lg overflow-hidden flex items-center justify-center mb-2">
                   {selectedItems.anillo ? (
                     <LazyImage
-                      src={selectedItems.anillo.image || 'https://via.placeholder.com/64'}
+                      src={getComponentImage(selectedItems.anillo, 'anillo') || 'https://via.placeholder.com/64'}
                       alt={selectedItems.anillo.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <span className="text-3xl text-white/60">+</span>
                   )}
                 </div>
                 <p className="text-xs sm:text-sm font-bold text-white">💍 Anillo</p>
-                {selectedItems.anillo && (
-                  <p className="text-xs text-white/90 mt-1 line-clamp-1 text-center">{selectedItems.anillo.title}</p>
-                )}
               </div>
             </div>
           </div>
