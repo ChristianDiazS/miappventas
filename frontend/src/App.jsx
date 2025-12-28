@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { PersonalizationProvider } from './context/PersonalizationContext';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
+import CookieConsent from './components/CookieConsent';
 import { Home } from './pages/Home';
 import { Products } from './pages/Products';
 import { ProductDetail } from './pages/ProductDetail';
@@ -72,6 +73,7 @@ export default function App() {
             </Routes>
           </main>
           <Footer />
+          <CookieConsent />
         </div>
       </PersonalizationProvider>
     </ErrorBoundary>
