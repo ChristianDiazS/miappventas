@@ -1,0 +1,49 @@
+# robots.txt para Un Poquito Variado
+# Controla el acceso de bots de búsqueda
+
+# Todos los bots
+User-agent: *
+Allow: /
+Allow: /products
+Allow: /categories
+Allow: /contact
+
+# Desallows
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /superadmin
+Disallow: /.env
+Disallow: /private
+Disallow: /config
+Disallow: /logs
+Disallow: /temp
+
+# Paths permitidos para buscadores
+Allow: /api-docs (solo en desarrollo, será bloqueado en prod)
+
+# Sitemap
+Sitemap: https://unpoquitovariado.com/sitemap.xml
+
+# Reglas específicas para Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Reglas específicas para Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Bloquear spam bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
