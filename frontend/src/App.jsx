@@ -6,6 +6,7 @@ import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import CookieConsent from './components/CookieConsent';
 import { ErrorBoundary, initializeSentryReact } from './config/sentry';
+import useGoogleAnalytics from './hooks/useGoogleAnalytics';
 import { Home } from './pages/Home';
 import { Products } from './pages/Products';
 import { ProductDetail } from './pages/ProductDetail';
@@ -32,6 +33,9 @@ import Contact from './pages/Contact';
 initializeSentryReact();
 
 export default function App() {
+  // Track page views with Google Analytics (respects cookie consent)
+  useGoogleAnalytics();
+
   return (
     <ErrorBoundary>
       <ErrorBoundaryComponent>
