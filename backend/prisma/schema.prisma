@@ -203,6 +203,7 @@ model Order {
   // Relations
   payments      Payment[]
   auditLogs     AuditLog[]
+  shipment      Shipment?
   
   @@index([userId])
   @@index([status])
@@ -359,3 +360,71 @@ enum DriverStatus {
   BUSY
   OFFLINE
 }
+
+// ============== SHIPPING ==============
+model ShippingZone {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique // "Costa", "Sierra", "Selva", etc
+  departments   String[]        // ["Lima", "Callao", "Ica", etc]
+  description   String?
+  active        Boolean         @default(true)
+  
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relations
+  shippingRates ShippingRate[]
+  
+  @@index([name])
+}
+
+model ShippingRate {
+  id            Int             @id @default(autoincrement())
+  zoneId        Int
+  zone          ShippingZone    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  
+  method        ShippingMethod  // STANDARD, EXPRESS, PICKUP
+  baseCost      Int             // en centavos
+  costPerKg     Int             // costo adicional por kg
+  estimatedDays Int             // días estimados de entrega
+  maxWeight     Float?          // peso máximo permitido
+  
+  active        Boolean         @default(true)
+  
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relations
+  shipments     Shipment[]
+  
+  @@unique([zoneId, method])
+  @@index([zoneId])
+}
+
+model Shipment {
+  id            Int             @id @default(autoincrement())
+  orderId       Int             @unique
+  order         Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  shippingRateId Int
+  shippingRate  ShippingRate    @relation(fields: [shippingRateId], references: [id])
+  
+  department    String          // Destino: "Lima", "Junín", etc
+  address       String          // Dirección completa
+  totalWeight   Float           // peso total en kg
+  shippingCost  Int             // en centavos
+  
+  trackingNumber String?
+  carrierName   String?         // Empresa de envío (Olva, IFEP, etc)
+  
+  status        String          @default("pending") // pending, shipped, delivered, failed
+  shippedAt     DateTime?
+  deliveredAt   DateTime?
+  
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  @@index([orderId])
+  @@index([status])
+}
+

@@ -470,7 +470,7 @@ Semana 1:
 - [x] Robots.txt y Sitemap.xml ✅ COMPLETADO (robots.txt estático + sitemap.xml dinámico)
 
 Semana 2:
-- [ ] Envío integrado (cálculo de costos)
+- [x] Envío integrado (cálculo de costos) ✅ COMPLETADO (Shipping service + API endpoints)
 - [ ] Dirección de envío en checkout
 - [ ] Database backups automáticos
 - [ ] Sentry para error tracking
@@ -488,16 +488,18 @@ Semana 3:
 ## 🎯 PUNTUACIÓN ACTUALIZADA
 
 **ANTES:** 7.6/10  
-**AHORA:** 9.3/10 ✅
+**SEMANA 1:** 9.3/10
+**AHORA:** 9.4/10 ✅
 
 ### Desglose:
 - Funcionalidad Core: 9/10 ✅
 - Seguridad: 9/10 ✅ (mejorado de 8/10)
 - Documentación Legal: 9/10 ✅ (mejorado de 3/10)
 - UX (Contacto): 9/10 ✅
-- SEO (Robots + Sitemap): 9/10 ✅ (nuevo)
-- Logging: 9/10 ✅ (nuevo)
-- GDPR Compliance: 9/10 ✅ (nuevo)
+- SEO (Robots + Sitemap): 9/10 ✅
+- Logging: 9/10 ✅
+- GDPR Compliance: 9/10 ✅
+- Envíos: 9/10 ✅ (NUEVO - Semana 2)
 - Rendimiento: 7/10 (sin cambios)
 - Testing: 5/10 (sin cambios, planned)
 

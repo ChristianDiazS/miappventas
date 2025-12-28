@@ -25,6 +25,7 @@ import superadminRoutes from './routes/superadmin.js';
 import debugRoutes from './routes/debug.js';
 import contactRoutes from './routes/contact.js';
 import sitemapRoutes from './routes/sitemap.js';
+import shippingRoutes from './routes/shipping.js';
 
 export function createApp() {
   const app = express();
@@ -91,6 +92,7 @@ export function createApp() {
   app.use('/api/superadmin', superadminRoutes);
   app.use('/api/contact', contactRoutes);
   app.use('/', sitemapRoutes); // Sitemap routes: /sitemap.xml, /sitemap-index.xml
+  app.use('/api/shipping', shippingRoutes);
   
   // Debug routes - Solo en desarrollo
   if (process.env.NODE_ENV !== 'production') {
