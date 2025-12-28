@@ -28,7 +28,10 @@ build/
 .next/
 out/
 
-# Prisma
+# Documentation - Local use only (no repo)
+HANDOFF_SIGUIENTE_DESARROLLADOR.md
+CELEBRACION_PROYECTO_COMPLETADO.md
+GIT_ACTUALIZACION_COMPLETADA.md# Prisma
 prisma/migrations/dev.db
 prisma/dev.db
 
