@@ -292,9 +292,9 @@ Haz click en:
 
 ```
 Semana 1:
-- [ ] Implementar endpoint /api/contact para emails
+- [x] Implementar endpoint /api/contact para emails ✅ COMPLETADO
 - [ ] Agregar logger seguro (reemplazar console.log)
-- [ ] Health check endpoint (/api/health)
+- [x] Health check endpoint (/api/health) ✅ COMPLETADO (básico en app.js)
 - [ ] Cookie consent banner (ley GDPR/e-Privacy)
 - [ ] Robots.txt y Sitemap.xml
 
@@ -308,7 +308,7 @@ Semana 2:
 Semana 3:
 - [ ] Performance optimization (Lighthouse 90+)
 - [ ] Load testing
-- [ ] Security audit
+- [x] Security audit ✅ COMPLETADO (8.8/10 score - AUDITORIA_SEGURIDAD.md)
 - [ ] E2E tests
 ```
 
