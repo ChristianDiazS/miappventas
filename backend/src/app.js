@@ -26,6 +26,7 @@ import debugRoutes from './routes/debug.js';
 import contactRoutes from './routes/contact.js';
 import sitemapRoutes from './routes/sitemap.js';
 import shippingRoutes from './routes/shipping.js';
+import backupRoutes from './routes/backup.js';
 
 export function createApp() {
   const app = express();
@@ -93,6 +94,7 @@ export function createApp() {
   app.use('/api/contact', contactRoutes);
   app.use('/', sitemapRoutes); // Sitemap routes: /sitemap.xml, /sitemap-index.xml
   app.use('/api/shipping', shippingRoutes);
+  app.use('/api/backup', backupRoutes);
   
   // Debug routes - Solo en desarrollo
   if (process.env.NODE_ENV !== 'production') {
