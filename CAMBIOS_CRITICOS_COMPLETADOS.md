@@ -471,7 +471,7 @@ Semana 1:
 
 Semana 2:
 - [x] Envío integrado (cálculo de costos) ✅ COMPLETADO (Shipping service + API endpoints)
-- [ ] Dirección de envío en checkout
+- [x] Dirección de envío en checkout ✅ COMPLETADO (Integración dinámica con API + fetchShippingOptions)
 - [ ] Database backups automáticos
 - [ ] Sentry para error tracking
 - [ ] Google Analytics

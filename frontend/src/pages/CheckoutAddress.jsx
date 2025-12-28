@@ -10,8 +10,10 @@ export function CheckoutAddress() {
   const navigate = useNavigate();
   const { cart, isLoading, getTotals, clearCart } = useCart();
   const [toast, setToast] = useState(null);
-  const [shippingMethod, setShippingMethod] = useState('standard');
+  const [shippingMethod, setShippingMethod] = useState('STANDARD');
   const [loading, setLoading] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState([]);
+  const [loadingShipping, setLoadingShipping] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -39,12 +41,60 @@ export function CheckoutAddress() {
     }
   }, [isLoading, cart.length, navigate]);
 
-  const shippingCosts = {
-    standard: 50,
-    express: 150
+  // Calcular peso total del carrito
+  const calculateTotalWeight = () => {
+    return cart.reduce((sum, item) => sum + (item.weight || 0.5) * item.quantity, 0);
   };
 
-  const currentShippingCost = shippingCosts[shippingMethod];
+  // Obtener opciones de envío cuando cambia el departamento
+  useEffect(() => {
+    if (formData.department) {
+      fetchShippingOptions(formData.department, calculateTotalWeight());
+    }
+  }, [formData.department, cart]);
+
+  const fetchShippingOptions = async (department, weight) => {
+    try {
+      setLoadingShipping(true);
+      const response = await fetch('http://localhost:5000/api/shipping/options', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ department, weight })
+      });
+
+      if (!response.ok) throw new Error('No se pudieron obtener opciones de envío');
+
+      const data = await response.json();
+      setShippingOptions(data.options || []);
+
+      // Si existen opciones y no hay seleccionada válida, seleccionar la primera
+      if (data.options && data.options.length > 0) {
+        const validMethods = data.options.map(o => o.method);
+        if (!validMethods.includes(shippingMethod)) {
+          setShippingMethod(validMethods[0]);
+        }
+      }
+    } catch (error) {
+      console.warn(`Error obteniendo opciones de envío: ${error.message}`);
+      // Fallback a opciones locales si falla el API
+      setShippingOptions([
+        { method: 'STANDARD', cost: 1000, estimatedDays: 3 },
+        { method: 'EXPRESS', cost: 2000, estimatedDays: 1 },
+        { method: 'PICKUP', cost: 0, estimatedDays: 1 }
+      ]);
+    } finally {
+      setLoadingShipping(false);
+    }
+  };
+
+  // Obtener costo de envío actual
+  const getCurrentShippingCost = () => {
+    if (shippingOptions.length === 0) return 0;
+    const selected = shippingOptions.find(o => o.method === shippingMethod);
+    return selected ? selected.cost / 100 : 0; // convertir centavos a soles
+  };
+
+  const currentShippingCost = getCurrentShippingCost();
   const { subtotal, tax, total } = getTotals(currentShippingCost);
 
   const handleInputChange = (name, value) => {
@@ -113,6 +163,7 @@ export function CheckoutAddress() {
         subtotal,
         tax,
         shippingCost: currentShippingCost,
+        shippingMethod,
         total
       };
 
@@ -129,7 +180,7 @@ export function CheckoutAddress() {
         body: JSON.stringify({
           items: checkoutData.items,
           shippingAddress: checkoutData.shippingAddress,
-          shippingMethod,
+          shippingMethod: checkoutData.shippingMethod,
           subtotal,
           tax,
           shippingCost: currentShippingCost,
@@ -308,50 +359,47 @@ export function CheckoutAddress() {
 
                   <div className="pt-6 border-t">
                     <h3 className="font-semibold text-gray-900 mb-4">Método de Envío</h3>
-                    <Card
-                      className="p-4 mb-3 border-2 cursor-pointer transition-all"
-                      onClick={() => setShippingMethod('standard')}
-                      style={{
-                        borderColor: shippingMethod === 'standard' ? '#06b6d4' : '#e5e7eb',
-                        backgroundColor: shippingMethod === 'standard' ? '#f0f9fa' : 'transparent'
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          checked={shippingMethod === 'standard'}
-                          onChange={() => setShippingMethod('standard')}
-                        />
-                        <div>
-                          <p className="font-semibold text-gray-900">Envío Estándar</p>
-                          <p className="text-sm text-gray-600">Entrega en 3-5 días hábiles</p>
-                        </div>
-                        <span className="ml-auto font-bold text-gray-900">$50</span>
+                    {loadingShipping ? (
+                      <p className="text-gray-600">Cargando opciones de envío...</p>
+                    ) : shippingOptions.length === 0 ? (
+                      <p className="text-gray-600">Selecciona un departamento para ver opciones</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {shippingOptions.map(option => (
+                          <Card
+                            key={option.method}
+                            className="p-4 border-2 cursor-pointer transition-all"
+                            onClick={() => setShippingMethod(option.method)}
+                            style={{
+                              borderColor: shippingMethod === option.method ? '#06b6d4' : '#e5e7eb',
+                              backgroundColor: shippingMethod === option.method ? '#f0f9fa' : 'transparent'
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="radio"
+                                name="shipping"
+                                checked={shippingMethod === option.method}
+                                onChange={() => setShippingMethod(option.method)}
+                              />
+                              <div>
+                                <p className="font-semibold text-gray-900 capitalize">
+                                  {option.method === 'STANDARD' && 'Envío Estándar'}
+                                  {option.method === 'EXPRESS' && 'Envío Express'}
+                                  {option.method === 'PICKUP' && 'Retiro en Tienda'}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Entrega en {option.estimatedDays} {option.estimatedDays === 1 ? 'día' : 'días'}
+                                </p>
+                              </div>
+                              <span className="ml-auto font-bold text-gray-900">
+                                {option.cost === 0 ? 'GRATIS' : `S/. ${(option.cost / 100).toFixed(2)}`}
+                              </span>
+                            </div>
+                          </Card>
+                        ))}
                       </div>
-                    </Card>
-                    <Card
-                      className="p-4 border-2 cursor-pointer transition-all hover:border-cyan-500"
-                      onClick={() => setShippingMethod('express')}
-                      style={{
-                        borderColor: shippingMethod === 'express' ? '#06b6d4' : '#e5e7eb',
-                        backgroundColor: shippingMethod === 'express' ? '#f0f9fa' : 'transparent'
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          checked={shippingMethod === 'express'}
-                          onChange={() => setShippingMethod('express')}
-                        />
-                        <div>
-                          <p className="font-semibold text-gray-900">Envío Express</p>
-                          <p className="text-sm text-gray-600">Entrega en 1-2 días hábiles</p>
-                        </div>
-                        <span className="ml-auto font-bold text-gray-900">$150</span>
-                      </div>
-                    </Card>
+                    )}
                   </div>
 
                   <div className="pt-6 border-t flex gap-3">
