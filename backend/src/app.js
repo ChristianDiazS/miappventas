@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './middleware/errorHandler.js';
 import { securityHeaders } from './middleware/securityHeaders.js';
 import { specs } from '../swagger-config.js';
+import logger from './config/logger.js';
 
 // Security Middleware
 import { globalLimiter, loginLimiter, apiLimiter, bruteForceProtection } from './middleware/rateLimiter.js';

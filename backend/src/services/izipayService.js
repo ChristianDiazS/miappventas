@@ -3,6 +3,8 @@
  * Configuration and utilities for Izipay API integration
  */
 
+import logger from '../config/logger.js';
+
 export const IZIPAY_CONFIG = {
   // Estos valores deben venir de variables de entorno
   apiKey: process.env.IZIPAY_API_KEY || 'test_key',
@@ -52,7 +54,7 @@ export async function createPaymentSession(orderId, amount, currency = 'PEN') {
 
     return await response.json();
   } catch (error) {
-    console.error('Error creating Izipay session:', error);
+    logger.error(`Error creating Izipay session: ${error.message}`);
     throw error;
   }
 }
@@ -80,7 +82,7 @@ export async function getPaymentDetails(sessionId) {
 
     return await response.json();
   } catch (error) {
-    console.error('Error getting payment details:', error);
+    logger.error(`Error getting payment details: ${error.message}`);
     throw error;
   }
 }
@@ -114,7 +116,7 @@ export async function refundPayment(transactionId, amount = null) {
 
     return await response.json();
   } catch (error) {
-    console.error('Error refunding payment:', error);
+    logger.error(`Error refunding payment: ${error.message}`);
     throw error;
   }
 }

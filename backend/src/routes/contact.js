@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const logger = require('../config/logger.js');
 
 // Configurar el transportador de email
 const transporter = nodemailer.createTransport({
@@ -83,7 +84,7 @@ router.post('/', async (req, res) => {
       message: 'Mensaje enviado correctamente. Nos contactaremos pronto.',
     });
   } catch (error) {
-    console.error('Error al enviar contacto:', error);
+    logger.error(`Error al enviar contacto: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: 'Error al procesar tu solicitud. Intenta más tarde.',

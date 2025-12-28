@@ -6,6 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import logger from '../config/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOGS_DIR = path.join(__dirname, '../../logs');
@@ -67,9 +68,9 @@ export async function logWebhookSuccess(
     // Actualizar métricas
     await updateMetrics(event, 'success', responseTime);
 
-    console.log(`✅ Webhook logged: ${event} (${orderId})`);
+    logger.info(`Webhook logged: ${event} (${orderId})`);
   } catch (error) {
-    console.error('Error logging webhook:', error);
+    logger.error(`Error logging webhook: ${error.message}`);
   }
 }
 

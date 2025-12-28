@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import logger from '../config/logger.js';
 
 const prisma = new PrismaClient();
 
@@ -22,7 +23,7 @@ export const getAllCategories = async (req, res) => {
 
     res.json(mainCategories);
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    logger.error(`Error fetching categories: ${error.message}`);
     res.status(500).json({ error: 'Error fetching categories' });
   }
 };
@@ -42,7 +43,7 @@ export const getCategoryById = async (req, res) => {
 
     res.json(category);
   } catch (error) {
-    console.error('Error fetching category:', error);
+    logger.error(`Error fetching category: ${error.message}`);
     res.status(500).json({ error: 'Error fetching category' });
   }
 };

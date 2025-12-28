@@ -164,7 +164,52 @@ if (process.env.NODE_ENV !== 'production') {
 
 ---
 
-### 8. ✅ RUTAS - Agregadas a App.jsx
+### 10. ✅ LOGGING - Logger Seguro con Winston Instalado
+
+**Archivo:** `backend/src/config/logger.js` (NEW)
+
+**Cambios:**
+- ✅ Instalado: `npm install winston`
+- ✅ Logger seguro con niveles: error, warn, info, http, debug
+- ✅ Archivos de log automáticos:
+  - `logs/error.log` - Solo errores
+  - `logs/combined.log` - Todos los logs
+- ✅ Rotación de logs configurada
+- ✅ Colorización en desarrollo, sin colorización en producción
+- ✅ Stream para integración con Morgan (HTTP requests)
+
+**Configuración:**
+```javascript
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'debug',
+  levels: { error: 0, warn: 1, info: 2, http: 3, debug: 4 },
+  format: custom format con timestamp,
+  transports: [
+    Console (con colorización),
+    File: error.log (errores solo),
+    File: combined.log (todos)
+  ]
+});
+```
+
+**Archivos Actualizados:**
+1. `backend/src/app.js` - Import: `import logger from './config/logger.js'`
+2. `backend/src/routes/contact.js` - `console.error` → `logger.error`
+3. `backend/src/controllers/categoryController.js` - `console.error` → `logger.error`
+4. `backend/src/services/izipayService.js` - 3x `console.error` → `logger.error`
+5. `backend/src/middleware/webhookLogger.js` - `console.log/error` → `logger.info/error`
+
+**Beneficios:**
+- ✅ Logs persistentes en archivos
+- ✅ Niveles configurables por entorno
+- ✅ Separación de errores críticos
+- ✅ Timestamp automático
+- ✅ Mejor monitoreo en producción
+- ✅ Compatible con herramientas de análisis (Sentry, ELK Stack)
+
+---
+
+### 11. ✅ RUTAS - Agregadas a App.jsx
 
 **Archivo:** `frontend/src/App.jsx`
 
@@ -184,7 +229,7 @@ import Contact from './pages/Contact';
 
 ---
 
-### 9. ✅ NAVEGACIÓN - Footer Actualizado
+### 12. ✅ NAVEGACIÓN - Footer Actualizado
 
 **Archivo:** `frontend/src/components/Layout/Footer.jsx`
 
@@ -293,7 +338,7 @@ Haz click en:
 ```
 Semana 1:
 - [x] Implementar endpoint /api/contact para emails ✅ COMPLETADO
-- [ ] Agregar logger seguro (reemplazar console.log)
+- [x] Agregar logger seguro (reemplazar console.log) ✅ COMPLETADO (Winston logger instalado y configurado)
 - [x] Health check endpoint (/api/health) ✅ COMPLETADO (básico en app.js)
 - [ ] Cookie consent banner (ley GDPR/e-Privacy)
 - [ ] Robots.txt y Sitemap.xml
